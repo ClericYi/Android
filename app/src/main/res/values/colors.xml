@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#3F51B5</color>
+    <color name="colorPrimaryDark">#303F9F</color>
+    <color name="colorAccent">#FF4081</color>
+
+    <color name="button_blue">#8EE5EE</color>
+    <color name="white">#FFFFFF</color>
+    <color name="accent">#607D8B</color>
+    <color name="auqamarin">#7FFFAA</color>
+    <color name="SpringGreen">#3CB371</color>
+    <color name="blue">#30509F</color>
+</resources>
