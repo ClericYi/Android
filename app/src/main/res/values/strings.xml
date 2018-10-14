@@ -1,3 +1,31 @@
 <resources>
     <string name="app_name">EasyFarming</string>
+    <!-- URL -->
+    <string name="URL_Login">http://39.108.153.134:80/api/userLogin</string>
+    <string name="URL_LoginOut">http://39.108.153.134:80/api/logOut</string>
+    <string name="URL_Device_GetAllDevices">http://39.108.153.134:80/api/user/getAllDevices/</string>
+
+    <!-- 字样  -->
+    <string name="main_bnv_device">设备管理</string>
+    <string name="main_bnv_user">用户中心</string>
+
+    <!-- 用户中心列表 -->
+    <string name="user_changephone">修改手机号码</string>
+    <string name="user_logs">获取日志</string>
+    <string name="loginout">注销</string>
+    <string name="personinfo">个人中心</string>
+    <string name="trigger">触发器</string>
+
+    <!-- 详细中显示的数据  -->
+    <string name="device_detail_id">设备编号</string>
+    <string name="device_detail_name">设备名称</string>
+    <string name="device_detail_group">所属群组</string>
+    <string name="device_detail_online">当前状态</string>
+
+
+    <!-- channel -->
+    <string name="group_name">优品派</string>
+    <string name="channel_name">任意门</string>
+    <string name="channel_description">Mqtt通知</string>
+
 </resources>

@@ -1,2 +1,5 @@
 # EasyFarming
 原java工程转成Kotlin，顺道尝试解决因为网速问题可能存在无法登陆的隐患
+现存的问题:
+1.因为fastjson中的jsonArray需要的参数Kotlin中不支持，所以会出现List为空的情况。
+临时解决方案:使用try,catch对异常捕捉实现返回
