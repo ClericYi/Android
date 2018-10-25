@@ -13,18 +13,11 @@
         app:layout_constraintBottom_toTopOf="parent"
         />
 
-    <android.support.design.widget.CoordinatorLayout
+    <android.support.design.widget.BottomNavigationView
+        android:id="@+id/main_bnv"
         android:layout_width="match_parent"
-        android:layout_height="60dp"
+        android:layout_height="wrap_content"
+        app:menu="@menu/main_bnv"
         app:layout_constraintBottom_toBottomOf="parent"
-        >
-
-        <android.support.design.bottomappbar.BottomAppBar
-            android:id="@+id/main_bab"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            >
-
-        </android.support.design.bottomappbar.BottomAppBar>
-    </android.support.design.widget.CoordinatorLayout>
+        />
 </android.support.constraint.ConstraintLayout>

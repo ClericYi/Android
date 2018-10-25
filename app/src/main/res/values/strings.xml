@@ -15,4 +15,16 @@
     <string name="device_online">在线设备</string>
     <string name="device_outline">离线设备</string>
 
+    <!-- main -->
+    <string name="main_bnv_device">设备</string>
+    <string name="main_bnv_user">用户</string>
+
+    <!--smartconfig-->
+    <string name="config">一键配置</string>
+    <string name="startconfig">开始配置</string>
+    <string name="ssid">WIFI账号: </string>
+    <string name="psw">WIFI密码: </string>
+    <string name="smartconfig">设置SmartConfig</string>
+    <string name="setting_tv_3">请输入Wifi密码</string>
+
 </resources>

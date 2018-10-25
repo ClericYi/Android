@@ -8,4 +8,11 @@
 
     <color name="login_button_active">#00D1B2</color>
 
+    <!-- smartconfig -->
+    <color name="app_main_color">#333333</color>
+    <color name="app_main_yellow">#F3C935</color>
+    <color name="tabUnSelected">#999999</color>
+    <color name="white_2">#fefefe</color>
+    <color name="iron">#CCCCCC</color>
+
 </resources>

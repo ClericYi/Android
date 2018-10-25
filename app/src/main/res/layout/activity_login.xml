@@ -12,8 +12,8 @@
 
             <ImageView
                 android:id="@+id/login_img"
-                android:layout_width="60dp"
-                android:layout_height="60dp"
+                android:layout_width="80dp"
+                android:layout_height="80dp"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
@@ -24,21 +24,23 @@
                 android:id="@+id/login_username_til"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:hint="@string/login_hint_username"
                 app:layout_constraintTop_toBottomOf="@id/login_img"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 android:layout_marginStart="20dp"
                 android:layout_marginEnd="20dp"
-                android:layout_marginTop="40dp"
+                android:layout_marginTop="80dp"
                 >
 
                 <EditText
                     android:id="@+id/login_username"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:textSize="20sp"
+                    android:layout_height="45dp"
+                    android:background="@drawable/ic_login_edittext"
+                    android:textSize="22sp"
                     android:inputType="text"
+                    android:hint="@string/login_hint_username"
+
                     />
             </android.support.design.widget.TextInputLayout>
 
@@ -46,22 +48,33 @@
                 android:id="@+id/login_password_til"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:hint="@string/login_hint_password"
                 app:layout_constraintTop_toBottomOf="@+id/login_username_til"
                 app:layout_constraintStart_toStartOf="@+id/login_username_til"
                 app:layout_constraintEnd_toEndOf="@+id/login_username_til"
-                android:layout_marginTop="25dp"
+                android:layout_marginTop="40dp"
                 app:passwordToggleEnabled="true"
                 >
 
                 <EditText
                     android:id="@+id/login_password"
+                    android:background="@drawable/ic_login_edittext"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="45dp"
                     android:inputType="textPassword"
-                    android:textSize="20sp"
+                    android:textSize="22sp"
+                    android:hint="@string/login_hint_password"
                     />
             </android.support.design.widget.TextInputLayout>
+
+            <CheckBox
+                android:id="@+id/login_remember"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="记住密码"
+                app:layout_constraintStart_toStartOf="@id/login_password_til"
+                app:layout_constraintTop_toBottomOf="@id/login_password_til"
+                app:layout_constraintBottom_toBottomOf="parent"
+                />
 
 
             <Button
@@ -73,7 +86,7 @@
                 android:background="@drawable/ic_login_button"
                 app:layout_constraintEnd_toEndOf="@id/login_password_til"
                 app:layout_constraintTop_toBottomOf="@+id/login_password_til"
-                android:layout_marginTop="20dp"
+                android:layout_marginTop="30dp"
                 />
 
         </android.support.constraint.ConstraintLayout>

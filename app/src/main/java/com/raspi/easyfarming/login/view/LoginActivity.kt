@@ -8,12 +8,15 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Message
 import android.support.v7.app.AppCompatActivity
+import android.text.Editable
 import android.util.Log
 import android.view.View
 import android.widget.Toast
 import com.alibaba.fastjson.JSON.parseObject
 import com.alibaba.fastjson.JSON.toJSONString
 import com.raspi.easyfarming.R
+import com.raspi.easyfarming.main.view.MainActivity
+import com.raspi.easyfarming.utils.SharePreferenceUtil
 import com.raspi.easyfarming.utils.okhttp.okHttpClientModel
 import com.raspi.easyfarming.utils.network.NetBroadcastReceiver
 import kotlinx.android.synthetic.main.activity_login.*
@@ -35,12 +38,18 @@ class LoginActivity : AppCompatActivity() {
     //广播
     private var netBroadcastReceiver:NetBroadcastReceiver?=null
 
+    //sharePreference
+    private var spUtil:SharePreferenceUtil?=null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
         initView()//对控件的样式等操作
         initClick()//初始化点击事件
+        initSharePreference()//初始化信息
     }
+
+
 
     /*************************              线程         ************************************/
 
@@ -99,6 +108,19 @@ class LoginActivity : AppCompatActivity() {
     /*************************              初始化         ************************************/
 
     /**
+     * 初始化信息
+     */
+    private fun initSharePreference() {
+        spUtil = SharePreferenceUtil(baseContext,"login")
+        val isChecked = spUtil?.getBoolean("isChecked")!!
+        if(isChecked) {
+            login_remember.isChecked = true
+            login_username.text = Editable.Factory.getInstance().newEditable(spUtil?.getString("username"))
+            login_password.text = Editable.Factory.getInstance().newEditable(spUtil?.getString("password"))
+        }
+    }
+
+    /**
      * 初始化点击事件
      */
     private fun initClick() {
@@ -127,10 +149,18 @@ class LoginActivity : AppCompatActivity() {
             super.handleMessage(msg)
             when(msg?.what){
                 LOGIN_SUCCESS -> {Log.e(TAG, "登陆成功", null)
+                    if(login_remember.isChecked){
+                        var Username = SharePreferenceUtil.ContentValue("username", login_username.text.toString())
+                        var Password = SharePreferenceUtil.ContentValue("password", login_password.text.toString())
+                        var isCheck = SharePreferenceUtil.ContentValue("isChecked", login_remember.isChecked)
+                        spUtil?.putValues(Username, Password, isCheck)
+                    }else{
+                        spUtil?.clear()
+                    }
                     val intent = Intent()
-//                    intent.setClass(self, MainActivity::class.java)
-//                    intent.putExtra("username",login_username.item_login.text)
-//                    startActivity(intent)
+                    intent.setClass(self, MainActivity::class.java)
+                    intent.putExtra("username",login_username.text.toString())
+                    startActivity(intent)
                 }
                 LOGIN_FAIL -> {
                     Log.e(TAG, "登陆失败，请检查您的账号和密码", null)
