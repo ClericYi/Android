@@ -1,4 +1,4 @@
-package com.raspi.easyfarming
+package com.raspi.easyfarming.utils.okhttp
 
 import okhttp3.OkHttpClient
 

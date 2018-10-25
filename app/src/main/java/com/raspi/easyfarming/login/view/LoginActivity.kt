@@ -1,5 +1,6 @@
 package com.raspi.easyfarming.login.view
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.content.IntentFilter
 import android.net.ConnectivityManager
@@ -7,18 +8,16 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Message
 import android.support.v7.app.AppCompatActivity
-import android.text.method.PasswordTransformationMethod
 import android.util.Log
 import android.view.View
 import android.widget.Toast
 import com.alibaba.fastjson.JSON.parseObject
 import com.alibaba.fastjson.JSON.toJSONString
 import com.raspi.easyfarming.R
-import com.raspi.easyfarming.main.view.MainActivity
-import com.raspi.easyfarming.okHttpClientModel
+import com.raspi.easyfarming.utils.okhttp.okHttpClientModel
 import com.raspi.easyfarming.utils.network.NetBroadcastReceiver
 import kotlinx.android.synthetic.main.activity_login.*
-import kotlinx.android.synthetic.main.item_login.view.*
+import kotlinx.android.synthetic.main.activity_login.view.*
 import okhttp3.*
 import java.util.ArrayList
 import java.util.HashMap
@@ -36,8 +35,6 @@ class LoginActivity : AppCompatActivity() {
     //广播
     private var netBroadcastReceiver:NetBroadcastReceiver?=null
 
-
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
@@ -45,7 +42,7 @@ class LoginActivity : AppCompatActivity() {
         initClick()//初始化点击事件
     }
 
-    /*              线程运行                */
+    /*************************              线程         ************************************/
 
     /**
      * 实现登陆线程
@@ -70,8 +67,8 @@ class LoginActivity : AppCompatActivity() {
                         .build()
                 //开始数据传输
                 var map = HashMap<String, String>()
-                map.put("loginParam", login_username.item_login.text.toString())
-                map.put("password", login_password.item_login.text.toString())
+                map.put("loginParam", login_username.login_username.text.toString())
+                map.put("password", login_password.login_password.text.toString())
                 val body = RequestBody.create(JSON, toJSONString(map))
 
                 var requestBody = Request.Builder()
@@ -83,15 +80,13 @@ class LoginActivity : AppCompatActivity() {
                 val result = response?.body()?.string()
                 Log.e(TAG, result, null)
 
-                val loginResult = parseObject(result).get("message").toString()
+                val loginResult = parseObject(result).get("state").toString()
 
 
-                if (loginResult.equals("登陆成功!")){
+                if (loginResult.equals("1")){
                     handler.sendEmptyMessage(LOGIN_SUCCESS)
-                }else if(true){
-                    handler.sendEmptyMessage(LOGIN_FAIL)
                 }else{
-
+                    handler.sendEmptyMessage(LOGIN_FAIL)
                 }
             }catch (e:Exception){
                 handler.sendEmptyMessage(LOGIN_ERROR)
@@ -101,13 +96,19 @@ class LoginActivity : AppCompatActivity() {
 
 
 
-    /*              初始化事件               */
+    /*************************              初始化         ************************************/
 
     /**
      * 初始化点击事件
      */
     private fun initClick() {
-        login_button.setOnClickListener(View.OnClickListener { startLoginThread() })
+        login_button.setOnClickListener(View.OnClickListener {
+            if((login_username.text.toString().equals("")||login_password.text.toString().equals(""))
+                ||(login_username.text.toString().equals(null)||login_password.text.toString().equals(null)))
+                Toast.makeText(baseContext,"请输入账号或密码", Toast.LENGTH_SHORT).show()
+            else
+                startLoginThread()
+        })
     }
 
     /**
@@ -115,28 +116,30 @@ class LoginActivity : AppCompatActivity() {
      */
     private fun initView() {
         supportActionBar?.hide()
-        login_username.item_login_text.text = "帐号"
-        login_username.item_login.hint = "请输入账号"
-        login_password.item_login_text.text = "密码"
-        login_password.item_login.hint = "请输入密码"
-        login_password.item_login.transformationMethod = PasswordTransformationMethod.getInstance()
     }
 
     /**
      * 初始化Handler
      */
-    private val handler = object : Handler() {
+    private val handler = @SuppressLint("HandlerLeak")
+    object : Handler() {
         override fun handleMessage(msg: Message?) {
             super.handleMessage(msg)
             when(msg?.what){
                 LOGIN_SUCCESS -> {Log.e(TAG, "登陆成功", null)
                     val intent = Intent()
-                    intent.setClass(self, MainActivity::class.java)
-                    intent.putExtra("username",login_username.item_login.text)
-                    startActivity(intent)
+//                    intent.setClass(self, MainActivity::class.java)
+//                    intent.putExtra("username",login_username.item_login.text)
+//                    startActivity(intent)
                 }
-                LOGIN_FAIL -> Log.e(TAG, "登陆失败", null)
-                LOGIN_ERROR -> Log.e(TAG, "出现异常", null)
+                LOGIN_FAIL -> {
+                    Log.e(TAG, "登陆失败，请检查您的账号和密码", null)
+                    Toast.makeText(self, "登陆失败，请检查您的账号和密码", Toast.LENGTH_SHORT).show()
+                }
+                LOGIN_ERROR -> {
+                    Log.e(TAG, "出现未知异常", null)
+                    Toast.makeText(self, "出现未知异常", Toast.LENGTH_SHORT).show()
+                }
                 else -> Log.e(TAG, "未知信息", null)
             }
         }
@@ -164,7 +167,8 @@ class LoginActivity : AppCompatActivity() {
         registerReceiver(netBroadcastReceiver, filter)
     }
 
-    /*              生命周期中的操作                 */
+    /***********************    生命周期中的操作    ****************************/
+
     override fun onPause() {
         super.onPause()
         unregisterReceiver(netBroadcastReceiver)
