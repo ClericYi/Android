@@ -5,6 +5,10 @@
     <string name="URL_Login">http://39.108.153.134:80/api/userLogin</string>
     <string name="URL_LoginOut">http://39.108.153.134:80/api/logOut</string>
     <string name="URL_Device_GetAllDevices">http://39.108.153.134:80/api/user/getAllDevices/</string>
+    <string name="URL_Device_GetCurrentState">http://39.108.153.134/api/user/getCurrentState</string>
+    <string name="URL_Device_GetAllGroups">http://39.108.153.134:80/api/user/getALlGroups</string>
+    <string name="URL_Device_AddGroup">http://39.108.153.134:80/api/user/addGroup</string>
+    <string name="URL_Device_DeleteDevice">http://39.108.153.134:80/api/user/delete/</string>
 
     <!-- 登录 -->
     <string name="login_next">登录</string>
@@ -14,6 +18,8 @@
     <!--device-->
     <string name="device_online">在线设备</string>
     <string name="device_outline">离线设备</string>
+    <string name="device_delete">删除</string>
+    <string name="device_edit">编辑</string>
 
     <!-- main -->
     <string name="main_bnv_device">设备</string>
@@ -26,5 +32,13 @@
     <string name="psw">WIFI密码: </string>
     <string name="smartconfig">设置SmartConfig</string>
     <string name="setting_tv_3">请输入Wifi密码</string>
+
+    <!-- 用户中心列表 -->
+    <string name="user_changephone">修改手机号码</string>
+    <string name="user_logs">获取日志</string>
+    <string name="loginout">注销</string>
+    <string name="personinfo">个人中心</string>
+    <string name="trigger">触发器</string>
+    <string name="netconfig">网络一键配置</string>
 
 </resources>

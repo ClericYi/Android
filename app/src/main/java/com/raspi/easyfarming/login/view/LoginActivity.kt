@@ -59,7 +59,7 @@ class LoginActivity : AppCompatActivity() {
     private fun startLoginThread() = Thread(Runnable {
         kotlin.run {
             try {
-                Log.e("LoginThread", "进入LoginThread",null)
+//                Log.e("LoginThread", "进入LoginThread",null)
                 //用于实现Cookie的保存
                 okHttpClientModel.mOkHttpClient = OkHttpClient.Builder()
                         .cookieJar(object:CookieJar{

@@ -4,13 +4,16 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".main.view.MainActivity">
+    tools:context=".main.view.MainActivity"
+    android:background="@color/gray_selector"
+    >
 
     <android.support.v4.view.ViewPager
         android:id="@+id/main_vp"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        app:layout_constraintBottom_toTopOf="parent"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toTopOf="@+id/main_bnv"
+        app:layout_constraintTop_toTopOf="parent"
         />
 
     <android.support.design.widget.BottomNavigationView
@@ -19,5 +22,6 @@
         android:layout_height="wrap_content"
         app:menu="@menu/main_bnv"
         app:layout_constraintBottom_toBottomOf="parent"
+        android:background="@drawable/ic_main_bnv"
         />
 </android.support.constraint.ConstraintLayout>

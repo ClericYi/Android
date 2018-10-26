@@ -34,7 +34,9 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".main.view.MainActivity"/>
+        <activity android:name=".main.view.MainActivity">
+
+        </activity>
 
         <!-- onestackconfig -->
         <activity android:name=".onestackconfig.activity.WifiConnectActivity" >
