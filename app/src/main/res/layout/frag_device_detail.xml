@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/gray_font_4"
+    >
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <android.support.constraint.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <ImageView
+                android:id="@+id/device_detail_img"
+                android:layout_width="60dp"
+                android:layout_height="130dp"
+                android:src="@drawable/ic_device_self"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                />
+            <TextView
+                android:id="@+id/device_detail_baseinfo_text"
+                android:layout_width="match_parent"
+                android:layout_height="30dp"
+                android:text="基础信息"
+                android:textSize="20dp"
+                android:gravity="center_vertical"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/device_detail_img"
+                android:layout_marginStart="10dp"
+                />
+            <!-- 存放基本信息 -->
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/device_detail_baseinfo"
+                android:background="@color/white"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/device_detail_baseinfo_text"
+                />
+
+            <TextView
+                android:id="@+id/device_detail_moreinfo_text"
+                android:layout_width="match_parent"
+                android:layout_height="30dp"
+                android:text="详情信息"
+                android:textSize="20dp"
+                android:gravity="center_vertical"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/device_detail_baseinfo"
+                android:layout_marginStart="10dp"
+                />
+
+            <!-- 存放更过信息 -->
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/device_detail_moreinfo"
+                android:background="@color/white"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/device_detail_moreinfo_text"
+                />
+
+            <!-- 存放温度指示 -->
+            <include android:id="@+id/device_detail_temp"
+                layout="@layout/item_device_detail_fun"
+                android:layout_width="0dp"
+                android:layout_height="120dp"
+                app:layout_constraintTop_toBottomOf="@id/device_detail_moreinfo"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+
+                 />
+
+                <!-- 存放湿度 -->
+
+            <include android:id="@+id/device_detail_humid"
+                layout="@layout/item_device_detail_fun"
+                android:layout_width="0dp"
+                android:layout_height="120dp"
+                app:layout_constraintTop_toBottomOf="@id/device_detail_temp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+
+                />
+            <!-- 存放气压 -->
+
+            <include android:id="@+id/device_detail_pressure"
+                layout="@layout/item_device_detail_fun"
+                android:layout_width="0dp"
+                android:layout_height="120dp"
+                app:layout_constraintTop_toBottomOf="@id/device_detail_humid"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+
+                />
+
+            <!-- 存放光敏 -->
+
+            <include android:id="@+id/device_detail_illuminance"
+                layout="@layout/item_device_detail_fun"
+                android:layout_width="0dp"
+                android:layout_height="120dp"
+                app:layout_constraintTop_toBottomOf="@id/device_detail_pressure"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+
+                />
+
+            <!-- 存放雨滴 -->
+
+            <include android:id="@+id/device_detail_rain"
+                layout="@layout/item_device_detail_fun"
+                android:layout_width="0dp"
+                android:layout_height="120dp"
+                app:layout_constraintTop_toBottomOf="@id/device_detail_illuminance"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                />
+
+        </android.support.constraint.ConstraintLayout>
+    </ScrollView>
+</android.support.constraint.ConstraintLayout>

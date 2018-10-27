@@ -161,6 +161,7 @@ class LoginActivity : AppCompatActivity() {
                     intent.setClass(self, MainActivity::class.java)
                     intent.putExtra("username",login_username.text.toString())
                     startActivity(intent)
+                    finish()
                 }
                 LOGIN_FAIL -> {
                     Log.e(TAG, "登陆失败，请检查您的账号和密码", null)

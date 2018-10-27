@@ -9,6 +9,10 @@
     <string name="URL_Device_GetAllGroups">http://39.108.153.134:80/api/user/getALlGroups</string>
     <string name="URL_Device_AddGroup">http://39.108.153.134:80/api/user/addGroup</string>
     <string name="URL_Device_DeleteDevice">http://39.108.153.134:80/api/user/delete/</string>
+    <string name="URL_Device_GetDeviceDetail">http://39.108.153.134:80/api/device/getDeviceDetail/</string>
+    <string name="URL_User_GetAllLog">http://39.108.153.134/api/device/getAllLog/</string>
+    <string name="URL_User_GetAllTriggers">http://39.108.153.134/api/device/getTriggers/</string>
+    <string name="URL_User_UpdateTriggerState">http://39.108.153.134/api/device/updateTriggerStatus/</string>
 
     <!-- 登录 -->
     <string name="login_next">登录</string>
@@ -20,6 +24,12 @@
     <string name="device_outline">离线设备</string>
     <string name="device_delete">删除</string>
     <string name="device_edit">编辑</string>
+
+    <!-- 添加设备 -->
+    <string name="add_device_name">设备名称</string>
+    <string name="add_device_comment">设备备注</string>
+    <string name="add_device_type">设备类型</string>
+    <string name="add_device_local">设备地址</string>
 
     <!-- main -->
     <string name="main_bnv_device">设备</string>
@@ -35,10 +45,26 @@
 
     <!-- 用户中心列表 -->
     <string name="user_changephone">修改手机号码</string>
-    <string name="user_logs">获取日志</string>
+    <string name="user_logs">日志信息</string>
     <string name="loginout">注销</string>
     <string name="personinfo">个人中心</string>
     <string name="trigger">触发器</string>
     <string name="netconfig">网络一键配置</string>
+
+    <!-- channel -->
+    <string name="channel_group_name">优品派</string>
+    <string name="channel_name">EasyFarming</string>
+    <string name="channel_description">EasyFarming</string>
+
+    <!-- 详细中显示的数据  -->
+    <string name="device_detail_id">设备编号</string>
+    <string name="device_detail_name">设备名称</string>
+    <string name="device_detail_group">所属群组</string>
+    <string name="device_detail_group_des">群组描述</string>
+    <string name="device_detail_online">当前状态</string>
+    <string name="device_detail_description">设备描述</string>
+    <string name="device_detail_location_describe">设备位置</string>
+    <string name="device_detail_location_longitude">位置经度</string>
+    <string name="device_detail_location_latitude">位置纬度</string>
 
 </resources>

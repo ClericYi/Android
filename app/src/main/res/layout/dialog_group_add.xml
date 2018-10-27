@@ -8,20 +8,26 @@
         android:id="@+id/dialog_addgroup_name"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:textSize="25sp"
+        android:background="@drawable/item_device_control"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
         android:layout_marginLeft="20dp"
         android:layout_marginRight="20dp"
-        android:hint="群组名称" />
+        android:layout_marginTop="10dp"
+        android:hint="群组名称"
+        />
 
     <EditText
         android:id="@+id/dialog_addgroup_comment"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        android:layout_marginLeft="20dp"
-        android:layout_marginRight="20dp"
+        android:textSize="25sp"
+        android:background="@drawable/item_device_control"
+        app:layout_constraintLeft_toLeftOf="@+id/dialog_addgroup_name"
+        app:layout_constraintRight_toRightOf="@+id/dialog_addgroup_name"
         app:layout_constraintTop_toBottomOf="@+id/dialog_addgroup_name"
+        android:layout_marginTop="10dp"
         android:hint="备注信息" />
 </android.support.constraint.ConstraintLayout>

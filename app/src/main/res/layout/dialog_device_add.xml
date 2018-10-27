@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <EditText
+        android:id="@+id/dialog_adddevice_name"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:textSize="25sp"
+        android:background="@drawable/item_device_control"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:layout_marginTop="15dp"
+        android:hint="@string/add_device_name"
+        />
+
+    <EditText
+        android:id="@+id/dialog_adddevice_comment"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:textSize="25sp"
+        android:background="@drawable/item_device_control"
+        app:layout_constraintLeft_toLeftOf="@+id/dialog_adddevice_name"
+        app:layout_constraintRight_toRightOf="@+id/dialog_adddevice_name"
+        app:layout_constraintTop_toBottomOf="@+id/dialog_adddevice_name"
+        android:layout_marginTop="15dp"
+        android:hint="@string/add_device_comment"
+
+        />
+    <EditText
+        android:id="@+id/dialog_adddevice_type"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:textSize="25sp"
+        android:background="@drawable/item_device_control"
+        app:layout_constraintLeft_toLeftOf="@+id/dialog_adddevice_name"
+        app:layout_constraintRight_toRightOf="@+id/dialog_adddevice_name"
+        app:layout_constraintTop_toBottomOf="@+id/dialog_adddevice_comment"
+        android:layout_marginTop="15dp"
+        android:hint="@string/add_device_type"
+        />
+    <EditText
+        android:id="@+id/dialog_adddevice_local"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:textSize="25sp"
+        android:background="@drawable/item_device_control"
+        app:layout_constraintLeft_toLeftOf="@+id/dialog_adddevice_name"
+        app:layout_constraintRight_toRightOf="@+id/dialog_adddevice_name"
+        app:layout_constraintTop_toBottomOf="@+id/dialog_adddevice_type"
+        android:layout_marginTop="15dp"
+        android:hint="@string/add_device_local"
+        />
+
+    <org.angmarch.views.NiceSpinner
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:background="@drawable/item_device_control"
+        app:layout_constraintLeft_toLeftOf="@+id/dialog_adddevice_name"
+        app:layout_constraintRight_toRightOf="@+id/dialog_adddevice_name"
+        app:layout_constraintTop_toBottomOf="@id/dialog_adddevice_local"
+        android:layout_marginTop="15dp"
+        />
+
+</android.support.constraint.ConstraintLayout>

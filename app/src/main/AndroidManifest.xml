@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="com.raspi.easyfarming">
 
     <!-- Permissions the Application Requires -->
@@ -23,7 +24,8 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme">
+        android:theme="@style/AppTheme"
+        tools:ignore="GoogleAppIndexingWarning">
         <activity
             android:name=".login.view.LoginActivity"
             android:launchMode="singleTask">
@@ -34,9 +36,18 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".main.view.MainActivity">
-
-        </activity>
+        <activity android:name=".main.view.MainActivity"
+            android:launchMode="singleTask"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="stateHidden|adjustPan"/>
+        <activity android:name=".user.view.LogsActivity"
+            android:label="@string/user_logs"
+            />
+        <activity android:name=".user.view.TriggersActivity"
+            android:label="@string/trigger"
+            />
+        <activity android:name=".device.view.DetailFrag"/>
+        <activity android:name=".device.view.DetailCenterAcitity"/>
 
         <!-- onestackconfig -->
         <activity android:name=".onestackconfig.activity.WifiConnectActivity" >
@@ -44,10 +55,11 @@
         </activity>
 
         <activity android:name=".onestackconfig.activity.SmartConfigActivity"
-            android:windowSoftInputMode="stateUnchanged|adjustResize"
+            android:windowSoftInputMode="stateHidden|adjustResize"
             android:screenOrientation="portrait"/>
 
-
+        <!-- Mqtt Service -->
+        <service android:name="org.eclipse.paho.android.service.MqttService"/>
     </application>
 
 </manifest>

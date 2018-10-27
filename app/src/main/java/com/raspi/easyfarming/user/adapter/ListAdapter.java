@@ -11,6 +11,9 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.raspi.easyfarming.R;
+import com.raspi.easyfarming.onestackconfig.activity.WifiConnectActivity;
+import com.raspi.easyfarming.user.view.LogsActivity;
+import com.raspi.easyfarming.user.view.TriggersActivity;
 
 import java.util.List;
 import java.util.Map;
@@ -42,16 +45,16 @@ public class ListAdapter extends RecyclerView.Adapter {
         view.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-//                if(i == 1){
-//                    Intent intent = new Intent(mContext, LogsActivity.class);
-//                    mContext.startActivity(intent);
-//                } else if(i == 2){
-//                    Intent intent = new Intent(mContext, TriggerActivity.class);
-//                    mContext.startActivity(intent);
-//                }else if(i == 3){
-//                    Intent intent = new Intent(mContext, WifiConnectActivity.class);
-//                    mContext.startActivity(intent);
-//                }
+                if(i == 1){
+                    Intent intent = new Intent(mContext, LogsActivity.class);
+                    mContext.startActivity(intent);
+                } else if(i == 2){
+                    Intent intent = new Intent(mContext, TriggersActivity.class);
+                    mContext.startActivity(intent);
+                }else if(i == 3){
+                    Intent intent = new Intent(mContext, WifiConnectActivity.class);
+                    mContext.startActivity(intent);
+                }
             }
         });
 
@@ -68,10 +71,10 @@ public class ListAdapter extends RecyclerView.Adapter {
         TextView text;//条目名称
         ImageView icon;//条目图标
 
-        public ViewHolder(View itemView) {
+         ViewHolder(View itemView) {
             super(itemView);
-            text = (TextView) itemView.findViewById(R.id.item_user_tv);
-            icon = (ImageView) itemView.findViewById(R.id.item_user_ic);
+            text = itemView.findViewById(R.id.item_user_tv);
+            icon = itemView.findViewById(R.id.item_user_ic);
         }
     }
 }

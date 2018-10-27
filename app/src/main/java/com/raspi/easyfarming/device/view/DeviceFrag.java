@@ -1,6 +1,7 @@
 package com.raspi.easyfarming.device.view;
 
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -18,11 +19,16 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.CheckBox;
+import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.alibaba.fastjson.JSONArray;
+import com.othershe.baseadapter.ViewHolder;
+import com.othershe.baseadapter.interfaces.OnItemClickListener;
+import com.othershe.baseadapter.interfaces.OnLoadMoreListener;
 import com.raspi.easyfarming.R;
 import com.raspi.easyfarming.device.adapter.ListAdapter;
 import com.raspi.easyfarming.utils.okhttp.okHttpClientModel;
@@ -69,7 +75,7 @@ public class DeviceFrag extends Fragment {
     private NiceSpinner groupSpinner;
     private RecyclerView device_rv;
     private TextView device_edit;
-    private TextView device_add;
+    private ImageView device_add;
     private TextView device_delete;
 
 
@@ -100,6 +106,8 @@ public class DeviceFrag extends Fragment {
         return view;
     }
 
+
+    /**************************** 线程 ******************************/
     /**
      * 获取所有设备线程
      */
@@ -158,8 +166,6 @@ public class DeviceFrag extends Fragment {
                     String result = response.body().string();
                     Log.e(TAG, result, null);
                     String getResult = parseObject(parseObject(result).get("data").toString()).get("data").toString();
-
-                    Map map = new HashMap();
 
                     if(getResult.equals("[]")){
                         handler.sendEmptyMessage(GETALLDEVICE_FAIL);
@@ -336,6 +342,26 @@ public class DeviceFrag extends Fragment {
                 deleteDeviceThread(list);
             }
         });
+
+        //添加设备
+        device_add.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                LayoutInflater inflater = getActivity().getLayoutInflater();
+                final View view = inflater.inflate(R.layout.dialog_device_add, null);
+                new AlertDialog.Builder(getContext())
+                        .setTitle("添加设备")
+                        .setView(view)
+                        .setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+
+                            }
+                        })
+                        .setNegativeButton("取消", null)
+                        .show();
+            }
+        });
     }
 
 
@@ -393,21 +419,21 @@ public class DeviceFrag extends Fragment {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
                 if(i == 0){
-
+                    getAllDevicesThread();
                 } else if(i < groups.size()-1 && i > 0) {
 
                 } else {
                     LayoutInflater inflater = getActivity().getLayoutInflater();
-                    final View addview = inflater.inflate(R.layout.dialog_group_add, null);
+                    final View addView = inflater.inflate(R.layout.dialog_group_add, null);
                     //添加分组选项
                     new AlertDialog.Builder(getContext())
-                            .setTitle("填写需要添加设备的信息")
-                            .setView(addview)
+                            .setTitle("添加分组")
+                            .setView(addView)
                             .setPositiveButton("确定", new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialogInterface, int i) {
-                                    TextView addgroup_name = addview.findViewById(R.id.dialog_addgroup_name);
-                                    TextView addgroup_comment = addview.findViewById(R.id.dialog_addgroup_comment);
+                                    TextView addgroup_name = addView.findViewById(R.id.dialog_addgroup_name);
+                                    TextView addgroup_comment = addView.findViewById(R.id.dialog_addgroup_comment);
                                     addGroupThread(addgroup_name.getText().toString(), addgroup_comment.getText().toString());
                                 }
                             })
@@ -431,8 +457,32 @@ public class DeviceFrag extends Fragment {
     private void initList() {
         devices = new ArrayList<>();
         //使用适配器
-        listAdapter = new ListAdapter(getContext(), devices);
+        listAdapter = new ListAdapter(getContext(), devices, true);
+        //页面缓冲
+        View emptyView = LayoutInflater.from(getContext()).inflate(R.layout.load_empty, (ViewGroup) device_rv.getParent(), false);
+        listAdapter.setEmptyView(emptyView);
+        listAdapter.setLoadingView(R.layout.load_loading);
+        listAdapter.setLoadEndView(R.layout.load_end);
+
+
+         //适配器中每一项配置点击事件
+        listAdapter.setOnItemClickListener(new OnItemClickListener<Map>() {
+            @Override
+            public void onItemClick(ViewHolder viewHolder, Map map, int i) {
+                if(isShow){
+                    ((CheckBox)viewHolder.getView(R.id.item_device_rb)).setChecked(!((CheckBox)viewHolder.getView(R.id.item_device_rb)).isChecked());
+                    listAdapter.getCheckedId().add(map.get("id").toString());
+                    Log.e("listAdapter", ""+listAdapter.getCheckedId().size(), null);
+                }else{
+                    Intent intent = new Intent(getContext(), DetailCenterAcitity.class);
+                    intent.putExtra("id", map.get("id").toString());
+                    getContext().startActivity(intent);
+                }
+            }
+        });
+
         device_rv.setAdapter(listAdapter);
+
 
         //设置样式
         device_rv.setLayoutManager(new LinearLayoutManager(getContext()));
@@ -446,11 +496,11 @@ public class DeviceFrag extends Fragment {
      * @param view
      */
     private void initView(View view) {
-        groupSpinner = (NiceSpinner) view.findViewById(R.id.frag_deivce_spinner);
-        device_rv = (RecyclerView) view.findViewById(R.id.frag_deivce_rv);
-        device_edit = (TextView) view.findViewById(R.id.frag_device_edit);
-        device_add = (TextView) view.findViewById(R.id.frag_device_add);
-        device_delete = (TextView) view.findViewById(R.id.frag_device_delete);
+        groupSpinner =  view.findViewById(R.id.frag_deivce_spinner);
+        device_rv =  view.findViewById(R.id.frag_deivce_rv);
+        device_edit =  view.findViewById(R.id.frag_device_edit);
+        device_add =  view.findViewById(R.id.frag_device_add);
+        device_delete =  view.findViewById(R.id.frag_device_delete);
     }
 
     /**
@@ -467,8 +517,7 @@ public class DeviceFrag extends Fragment {
                         Log.e(TAG, "获取所有设备成功", null);
                         break;
                     case GETALLDEVICE_FAIL:
-                        listAdapter.notifyDataSetChanged();
-                        Toast.makeText(getContext(), "不存在更多设备", Toast.LENGTH_SHORT).show();
+                        listAdapter.loadEnd();
                         break;
                     case GETALLDEVICE_ERROR:
                         Log.e(TAG, "获取所有设备失败", null);

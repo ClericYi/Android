@@ -2,25 +2,28 @@
 <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
-
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="@drawable/ic_main_bnv"
+    >
 
     <TextView
         android:id="@+id/frag_device_edit"
         android:layout_width="wrap_content"
         android:layout_height="20dp"
         android:text="@string/device_edit"
+        android:textSize="16dp"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         android:layout_marginStart="10dp"
         android:layout_marginTop="10dp"/>
 
-    <TextView
+    <ImageView
         android:id="@+id/frag_device_add"
-        android:layout_width="20dp"
-        android:layout_height="20dp"
-        android:background="@drawable/ic_device_add"
+        android:layout_width="30dp"
+        android:layout_height="0dp"
+        android:src="@drawable/ic_device_add"
         app:layout_constraintTop_toTopOf="@+id/frag_device_edit"
+        app:layout_constraintBottom_toBottomOf="@+id/frag_device_edit"
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginEnd="10dp"
         />
@@ -34,7 +37,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toTopOf="@id/frag_deivce_rv"
-        android:layout_marginTop="10dp"
+        android:layout_marginTop="15dp"
         />
 
     <android.support.v7.widget.RecyclerView
@@ -44,6 +47,7 @@
         android:background="@color/white"
         app:layout_constraintTop_toBottomOf="@id/frag_deivce_spinner"
         app:layout_constraintBottom_toTopOf="@id/frag_device_delete"
+        android:layout_marginTop="5dp"
         />
 
     <TextView
