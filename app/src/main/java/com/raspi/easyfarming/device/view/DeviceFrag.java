@@ -64,6 +64,10 @@ public class DeviceFrag extends Fragment {
     private final int ADDGROUP_SUCCESS = 12;
     private final int ADDGROUP_FAIL = 13;
     private final int ADDGROUP_ERROR = 14;
+    private final int ADDDEVICE_SUCCESS = 15;
+    private final int ADDDEVICE_FAIL = 16;
+    private final int ADDDEVICE_ERROR = 17;
+
 
 
     public static final okhttp3.MediaType JSON
@@ -84,6 +88,7 @@ public class DeviceFrag extends Fragment {
     private List<String> groups;
     private List<String> groupName;
     private List<String> groupNum;
+
     private boolean isShow = false;
 
 
@@ -117,10 +122,16 @@ public class DeviceFrag extends Fragment {
             @Override
             public void run() {
                 try {
-
-                    Request request = new Request.Builder()
-                            .url(getContext().getResources().getString(R.string.URL_Device_GetAllDevices)+PAGE+"/"+SIZE)
-                            .build();
+                    Request request = null;
+                    if(groupSpinner.getSelectedIndex()==0) {
+                        request = new Request.Builder()
+                                .url(getContext().getResources().getString(R.string.URL_Device_GetAllDevices) + PAGE + "/" + SIZE)
+                                .build();
+                    }else{
+                        request= new Request.Builder()
+                                .url(getContext().getResources().getString(R.string.URL_Device_getAllDevicesByGroup)+groupNum.get(groupSpinner.getSelectedIndex())+"/" + PAGE + "/" + SIZE)
+                                .build();
+                    }
 
                     Response response = okHttpClientModel.INSTANCE.getMOkHttpClient().newCall(request).execute();
 
@@ -155,11 +166,16 @@ public class DeviceFrag extends Fragment {
             public void run() {
                 try {
 
-                    String url = getContext().getResources().getString(R.string.URL_Device_GetAllDevices)+ PAGE + "/"+SIZE;
-
-                    Request request = new Request.Builder()
-                            .url(url)
-                            .build();
+                    Request request = null;
+                    if(groupSpinner.getSelectedIndex()==0) {
+                        request = new Request.Builder()
+                                .url(getContext().getResources().getString(R.string.URL_Device_GetAllDevices) + PAGE + "/" + SIZE)
+                                .build();
+                    }else{
+                        request= new Request.Builder()
+                                .url(getContext().getResources().getString(R.string.URL_Device_getAllDevicesByGroup)+groupNum.get(groupSpinner.getSelectedIndex())+"/" + PAGE + "/" + SIZE)
+                                .build();
+                    }
 
                     Response response = okHttpClientModel.INSTANCE.getMOkHttpClient().newCall(request).execute();
 
@@ -269,6 +285,63 @@ public class DeviceFrag extends Fragment {
     }
 
     /**
+     * 添加设备
+     * @param name
+     * @param comment
+     * @param groupId
+     * @param local
+     * @param type
+     */
+    private void createDeviceThread(final String name, final String comment, final String groupId, final String local, final String type){
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    if(name.equals("")||comment.equals("")||local.equals("")||type.equals("")||groupId.equals("")){
+                        handler.sendEmptyMessage(ADDDEVICE_FAIL);
+                        return;
+                    }
+
+                    Map map = new HashMap();
+                    map.put("deviceDescribe", comment);
+                    map.put("deviceName", name);
+                    map.put("deviceType", type);
+                    map.put("groupId", groupId);
+                    map.put("locationDescribe", local);
+                    map.put("latitude", "39.53");
+                    map.put("longitude", "116.23");
+
+                    Log.e(TAG, toJSONString(map),null);
+
+                    RequestBody body = RequestBody.create(JSON, toJSONString(map));
+
+                    Request request = new Request.Builder()
+                            .url(getContext().getResources().getString(R.string.URL_Device_createDevice))
+                            .post(body)
+                            .build();
+
+                    Response response = okHttpClientModel.INSTANCE.getMOkHttpClient().newCall(request).execute();
+                    String result = response.body().string();
+                    Log.e(TAG, result, null);
+
+                    String getResult = parseObject(result).get("state").toString();
+
+                    if(!getResult.equals("1")){
+                        handler.sendEmptyMessage(ADDDEVICE_FAIL);
+                        return;
+                    }else {
+                        Log.e(TAG, result, null);
+                        handler.sendEmptyMessage(ADDDEVICE_SUCCESS);
+                    }
+                }catch (Exception e) {
+                    e.printStackTrace();
+                    handler.sendEmptyMessage(ADDDEVICE_ERROR);
+                }
+            }
+        }).start();
+    }
+
+    /**
      * 删除设备线程
      */
     public void deleteDeviceThread(final List<String> deviceid){
@@ -349,19 +422,42 @@ public class DeviceFrag extends Fragment {
             public void onClick(View v) {
                 LayoutInflater inflater = getActivity().getLayoutInflater();
                 final View view = inflater.inflate(R.layout.dialog_device_add, null);
+                final NiceSpinner spinner = view.findViewById(R.id.dialog_adddevice_group);
+                initDialogSpinner(spinner);
                 new AlertDialog.Builder(getContext())
                         .setTitle("添加设备")
                         .setView(view)
                         .setPositiveButton("确定", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
-
+                                TextView name = view.findViewById(R.id.dialog_adddevice_name);
+                                TextView comment = view.findViewById(R.id.dialog_adddevice_name);
+                                TextView local = view.findViewById(R.id.dialog_adddevice_name);
+                                TextView type = view.findViewById(R.id.dialog_adddevice_name);
+                                createDeviceThread(name.getText().toString(),
+                                        comment.getText().toString(),
+                                        groupNum.get(spinner.getSelectedIndex()),
+                                        local.getText().toString(),
+                                        type.getText().toString()
+                                        );
                             }
+
+
                         })
                         .setNegativeButton("取消", null)
                         .show();
             }
         });
+    }
+
+    /**
+     * 初始化Spinner
+     * @param spinner
+     */
+    public void initDialogSpinner(NiceSpinner spinner){
+        groupAdapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_item, groupName);
+        groupAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinner.setAdapter(groupAdapter);
     }
 
 
@@ -384,14 +480,10 @@ public class DeviceFrag extends Fragment {
                     int totalItemCount = devices.size();
                     Log.e(TAG, "下拉加载", null);
                     // 判断是否滚动到底部，并且是向右滚动
-                    if (lastVisibleItem == (totalItemCount - 1)) {
+                    if (lastVisibleItem == totalItemCount) {
                         //加载更多功能的代码
                         Log.e(TAG, "加载中", null);
                         getRestDevicesThread();
-                    }
-                    //判断是否为开启
-                    if(firstVisibleItem == 0 && device_rv.canScrollVertically(1)){
-                        groupSpinner.setVisibility(View.VISIBLE);
                     }
                 }
             }
@@ -418,10 +510,8 @@ public class DeviceFrag extends Fragment {
         groupSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-                if(i == 0){
+                if(i < groups.size()-1){
                     getAllDevicesThread();
-                } else if(i < groups.size()-1 && i > 0) {
-
                 } else {
                     LayoutInflater inflater = getActivity().getLayoutInflater();
                     final View addView = inflater.inflate(R.layout.dialog_group_add, null);
@@ -556,6 +646,17 @@ public class DeviceFrag extends Fragment {
                     case GETALLGROUP_ERROR:
                         Toast.makeText(getContext(), "获取分组失败", Toast.LENGTH_SHORT).show();
                         Log.e(TAG, "获取所有分组失败", null);
+                        break;
+                    case ADDDEVICE_SUCCESS:
+                        Toast.makeText(getContext(), "设备添加成功", Toast.LENGTH_SHORT).show();
+                        Log.e(TAG, "设备添加成功", null);
+                        break;
+                    case ADDDEVICE_FAIL:
+                        Toast.makeText(getContext(), "设备添加失败", Toast.LENGTH_SHORT).show();
+                        Log.e(TAG, "获取所有分组失败", null);
+                        break;
+                    case ADDDEVICE_ERROR:
+                        Log.e(TAG, "设备添加失败", null);
                         break;
                 }
                 return false;

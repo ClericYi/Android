@@ -16,6 +16,7 @@ import com.alibaba.fastjson.JSON.parseObject
 import com.alibaba.fastjson.JSON.toJSONString
 import com.raspi.easyfarming.R
 import com.raspi.easyfarming.main.view.MainActivity
+import com.raspi.easyfarming.utils.MD5Utils
 import com.raspi.easyfarming.utils.SharePreferenceUtil
 import com.raspi.easyfarming.utils.okhttp.okHttpClientModel
 import com.raspi.easyfarming.utils.network.NetBroadcastReceiver
@@ -77,7 +78,7 @@ class LoginActivity : AppCompatActivity() {
                 //开始数据传输
                 var map = HashMap<String, String>()
                 map.put("loginParam", login_username.login_username.text.toString())
-                map.put("password", login_password.login_password.text.toString())
+                map.put("password", MD5Utils.stringToMD5(login_password.login_password.text.toString()))
                 val body = RequestBody.create(JSON, toJSONString(map))
 
                 var requestBody = Request.Builder()

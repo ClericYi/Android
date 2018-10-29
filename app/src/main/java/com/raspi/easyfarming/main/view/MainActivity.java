@@ -22,11 +22,13 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.MenuItem;
 import android.widget.Toast;
 
 import com.raspi.easyfarming.R;
-import com.raspi.easyfarming.device.view.CenterFrag;
+import com.raspi.easyfarming.device.view.DeviceCenterFrag;
+import com.raspi.easyfarming.spot.view.SpotFrag;
 import com.raspi.easyfarming.user.view.UserFrag;
 import com.raspi.easyfarming.utils.network.NetBroadcastReceiver;
 
@@ -87,8 +89,8 @@ public class MainActivity extends AppCompatActivity {
         initBottomNav();//初始化bottomNavigationView
         initIntentObject();//初始化数据
         //MQTT初始化
-//        initSDK(this, RECENVETOPICFORMAT);
-//        connectServer();
+        initSDK(this, RECENVETOPICFORMAT);
+        connectServer();
     }
 
     /**
@@ -118,8 +120,11 @@ public class MainActivity extends AppCompatActivity {
                     case R.id.main_bnv_device:
                         position = 0;
                         break;
+                    case R.id.main_bnv_spot:
+                        position  = 1;
+                        break;
                     case R.id.main_bnv_user:
-                        position = 1;
+                        position = 2;
                         break;
                 }
                 viewPager.setCurrentItem(position);
@@ -133,13 +138,15 @@ public class MainActivity extends AppCompatActivity {
      * 初始化分页
      */
     private void initPager() {
-        viewPager.setOffscreenPageLimit(2);
+        viewPager.setOffscreenPageLimit(3);
 
-        CenterFrag centerFrag  = new CenterFrag();
+        DeviceCenterFrag deviceCenterFrag = new DeviceCenterFrag();
         UserFrag userFrag = new UserFrag();
+        SpotFrag spotCenterFrag = new SpotFrag();
         //添加fragment
         fragments = new ArrayList<Fragment>();
-        fragments.add(centerFrag);
+        fragments.add(deviceCenterFrag);
+        fragments.add(spotCenterFrag);
         fragments.add(userFrag);
 
         //适配器
@@ -161,6 +168,7 @@ public class MainActivity extends AppCompatActivity {
             //图标Id
             int[] itemIds = {
                     R.id.main_bnv_device,
+                    R.id.main_bnv_spot,
                     R.id.main_bnv_user
             };
 
@@ -439,5 +447,15 @@ public class MainActivity extends AppCompatActivity {
                 e.printStackTrace();
             }
         }
+    }
+
+    /*********************** 物理键重写 ******************************/
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if (keyCode==KeyEvent.KEYCODE_BACK){
+            moveTaskToBack(true);
+            return false;
+        }
+        return super.onKeyDown(keyCode, event);
     }
 }

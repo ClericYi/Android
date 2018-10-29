@@ -13,10 +13,14 @@ import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.alibaba.fastjson.JSONArray;
+import com.othershe.baseadapter.interfaces.OnLoadMoreListener;
 import com.raspi.easyfarming.R;
 import com.raspi.easyfarming.user.adapter.LogsListAdapter;
 import com.raspi.easyfarming.utils.network.NetBroadcastReceiver;
@@ -56,6 +60,7 @@ public class LogsActivity extends AppCompatActivity {
 
     //数据
     private List<Map> listMaps;
+    private int getSize = 0;
 
     //handler
     private Handler handler;
@@ -135,6 +140,7 @@ public class LogsActivity extends AppCompatActivity {
                         return;
                     }
                     List<Map> result_devices = JSONArray.parseArray(data, Map.class);
+                    getSize = result_devices.size();
                     listMaps.addAll(result_devices);
                     handler.sendEmptyMessage(GETALLLOGS_SUCCESS);
                 }catch (Exception e){
@@ -158,6 +164,9 @@ public class LogsActivity extends AppCompatActivity {
             public boolean handleMessage(Message msg) {
                 switch (msg.what) {
                     case GETALLLOGS_SUCCESS:
+                        if(getSize < SIZE){
+                            logsListAdapter.loadEnd();
+                        }
                         PAGE++;
                         logsListAdapter.notifyDataSetChanged();
                         break;
@@ -178,8 +187,20 @@ public class LogsActivity extends AppCompatActivity {
         listMaps = new ArrayList<Map>();
         listMaps.clear();
 
-        logsListAdapter = new LogsListAdapter(getBaseContext(), listMaps);
+        logsListAdapter = new LogsListAdapter(getBaseContext(), listMaps,true);
+        //页面缓冲
+        View emptyView = LayoutInflater.from(getBaseContext()).inflate(R.layout.load_empty, (ViewGroup) recyclerView.getParent(), false);
+        logsListAdapter.setEmptyView(emptyView);
+        logsListAdapter.setLoadingView(R.layout.load_loading);
+        logsListAdapter.setLoadEndView(R.layout.load_loading);
         recyclerView.setAdapter(logsListAdapter);
+        //设置加载更多触发的事件监听
+        logsListAdapter.setOnLoadMoreListener(new OnLoadMoreListener() {
+            @Override
+            public void onLoadMore(boolean isReload) {
+                Log.e(TAG, "OnLoadMore",null);
+            }
+        });
 
         recyclerView.setLayoutManager(new LinearLayoutManager(getBaseContext()));
         recyclerView.setHasFixedSize(true);
@@ -209,7 +230,7 @@ public class LogsActivity extends AppCompatActivity {
                     int totalItemCount = listMaps.size();
                     Log.e(TAG, "下拉加载", null);
                     // 判断是否滚动到底部，并且是向右滚动
-                    if (lastVisibleItem == (totalItemCount - 1)) {
+                    if (lastVisibleItem == totalItemCount) {
                         //加载更多功能的代码
                         Log.e(TAG, "加载中", null);
                         getRestLogThread();

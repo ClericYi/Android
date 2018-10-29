@@ -8,7 +8,7 @@ import android.view.ViewGroup
 import com.raspi.easyfarming.R
 import kotlinx.android.synthetic.main.frag_device.*
 
-class CenterFrag: Fragment(){
+class DeviceCenterFrag: Fragment(){
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return LayoutInflater.from(context).inflate(R.layout.frag_device, container, false)

@@ -13,6 +13,9 @@
     <string name="URL_User_GetAllLog">http://39.108.153.134/api/device/getAllLog/</string>
     <string name="URL_User_GetAllTriggers">http://39.108.153.134/api/device/getTriggers/</string>
     <string name="URL_User_UpdateTriggerState">http://39.108.153.134/api/device/updateTriggerStatus/</string>
+    <string name="URL_User_getAllOnlineDevicesByAppUser">http://39.108.153.134/api/user/getAllOnlineDevicesByAppUser/</string>
+    <string name="URL_Device_getAllDevicesByGroup">http://39.108.153.134/api/user/getAllDevicesByGroup/</string>
+    <string name="URL_Device_createDevice">http://39.108.153.134/api/user/createADevice</string>
 
     <!-- 登录 -->
     <string name="login_next">登录</string>
@@ -33,6 +36,7 @@
 
     <!-- main -->
     <string name="main_bnv_device">设备</string>
+    <string name="main_bnv_spot">监控</string>
     <string name="main_bnv_user">用户</string>
 
     <!--smartconfig-->

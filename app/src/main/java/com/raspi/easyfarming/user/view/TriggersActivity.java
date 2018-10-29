@@ -53,6 +53,7 @@ public class TriggersActivity extends AppCompatActivity {
 
     //数据
     private List<Map> triggers;
+    private int getSize = 0;
 
     //适配器
     private TriggersAdapter triggersAdapter;
@@ -74,7 +75,6 @@ public class TriggersActivity extends AppCompatActivity {
         initView();//初始化控件
         initList();//初始化列表
         initRv();//RecycleView下拉加载
-        //initScroll();//实现滑动删除
     }
 
 
@@ -109,9 +109,12 @@ public class TriggersActivity extends AppCompatActivity {
                     Log.e(TAG, result, null);
                     String data = parseObject(parseObject(result).get("data").toString()).get("data").toString();
 
-                    List<Map> map = new ArrayList<Map>();
-                    map = JSONArray.parseArray(data, Map.class);
-
+                    if(data.equals("[]")){
+                        handler.sendEmptyMessage(GETALLTRIGGERS_FAIL);
+                        return;
+                    }
+                    List<Map> map = JSONArray.parseArray(data, Map.class);
+                    getSize = map.size();
                     triggers.addAll(map);
                     handler.sendEmptyMessage(GETALLTRIGGERS_SUCCESS);
 
@@ -227,10 +230,12 @@ public class TriggersActivity extends AppCompatActivity {
                     int totalItemCount = triggers.size();
                     Log.e(TAG, "下拉加载", null);
                     // 判断是否滚动到底部，并且是向右滚动
-                    if (lastVisibleItem == (totalItemCount - 1)&&lastVisibleItem>=8) {
+                    if (lastVisibleItem == totalItemCount) {
                         //加载更多功能的代码
                         Log.e(TAG, "加载中", null);
                         getRestTriggerThread();
+                    }else{
+                        triggersAdapter.loadEnd();
                     }
                 }
             }
@@ -251,6 +256,9 @@ public class TriggersActivity extends AppCompatActivity {
                     case GETALLTRIGGERS_FAIL:
                         break;
                     case GETALLTRIGGERS_SUCCESS:
+                        if(getSize < Size){
+                            triggersAdapter.loadEnd();
+                        }
                         Page++;
                         triggersAdapter.notifyDataSetChanged();
                         Toast.makeText(self, "触发器获取成功", Toast.LENGTH_SHORT).show();
