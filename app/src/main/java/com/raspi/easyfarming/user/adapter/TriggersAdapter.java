@@ -13,6 +13,7 @@ import android.widget.TextView;
 import com.othershe.baseadapter.ViewHolder;
 import com.othershe.baseadapter.base.CommonBaseAdapter;
 import com.raspi.easyfarming.R;
+import com.raspi.easyfarming.user.view.TriggersActivity;
 import com.raspi.easyfarming.utils.okhttp.okHttpClientModel;
 
 import java.util.List;
@@ -32,7 +33,7 @@ public class TriggersAdapter extends CommonBaseAdapter<Map> {
 
 
     @Override
-    protected void convert(ViewHolder viewHolder, Map map, int i) {
+    protected void convert(ViewHolder viewHolder, final Map map, int i) {
         viewHolder.setText(R.id.item_trigger_text, map.get("name").toString());
         viewHolder.setText(R.id.item_trigger_description, map.get("name").toString());
         ((Switch)viewHolder.getView(R.id.item_trigger_switch)).setChecked((boolean) map.get("isStart"));
@@ -42,8 +43,5 @@ public class TriggersAdapter extends CommonBaseAdapter<Map> {
     protected int getItemLayoutId() {
         return R.layout.item_trigger;
     }
-
-
-
 
 }

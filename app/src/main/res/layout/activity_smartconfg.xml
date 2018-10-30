@@ -20,7 +20,8 @@
                 android:layout_height="45dp"
                 android:layout_centerVertical="true"
                 android:padding="13dp"
-                android:src="@mipmap/back" />
+                android:src="@drawable/ic_back"
+                />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -55,7 +56,7 @@
                 android:id="@+id/tv_ssid"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textColor="@color/app_main_yellow"
+                android:textColor="@color/login_button_active"
                 android:textSize="18sp"
                 android:text=""/>
 
@@ -91,7 +92,7 @@
             android:layout_marginTop="10dp"
             android:background="@drawable/yellow_shape"
             android:text="@string/startconfig"
-            android:textColor="@color/white_2"
+            android:textColor="@color/white"
             android:textSize="18sp" />
 
         <TextView

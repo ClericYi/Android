@@ -15,6 +15,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.raspi.easyfarming.R;
 import com.raspi.easyfarming.spot.adapter.SpotAdapter;
@@ -84,8 +85,11 @@ public class SpotFrag extends Fragment {
         initHandler();//初始化Handler
         initList();//初始化列表
         initThread();//初始化线程
+        initRv();//实现下拉加载
         return view;
     }
+
+
 
     /******************************************  MQTT数据处理*********************************************************/
 
@@ -341,6 +345,33 @@ public class SpotFrag extends Fragment {
 
     /************************ 初始化  ******************************/
 
+
+    /**
+     * 为RcycleView增加下拉加载
+     */
+    private void initRv() {
+        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+
+            @Override
+            public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
+                super.onScrollStateChanged(recyclerView, newState);
+                LinearLayoutManager manager = (LinearLayoutManager) recyclerView.getLayoutManager();
+                if (newState == RecyclerView.SCROLL_STATE_IDLE) {
+                    //获取最后一个完全显示的ItemPosition ,角标值
+                    int lastVisibleItem = manager.findLastCompletelyVisibleItemPosition();
+                    //所有条目,数量值
+                    int totalItemCount = listMap.size();
+                    Log.e(TAG, "下拉加载", null);
+                    // 判断是否滚动到底部，并且是向右滚动
+                    if (lastVisibleItem == totalItemCount) {
+                        //加载更多功能的代码
+                        Log.e(TAG, "加载中", null);
+                        getRestOnlineDevicesByAppUserThread();
+                    }
+                }
+            }
+        });
+    }
     /**
      * 初始化线程
      */
@@ -360,6 +391,7 @@ public class SpotFrag extends Fragment {
         spotAdapter.setEmptyView(emptyView);
         spotAdapter.setLoadingView(R.layout.load_loading);
         spotAdapter.setLoadEndView(R.layout.load_end);
+
 
         recyclerView.setAdapter(spotAdapter);
         //设置样式
@@ -387,12 +419,26 @@ public class SpotFrag extends Fragment {
                     case GET_SUCCESS:
                         //初始化
                         Log.e("Spot", "Success", null);
-                        initSDK(getContext(), RECENVETOPICFORMAT);
-                        connectServer();
+//                        initSDK(getContext(), RECENVETOPICFORMAT);
+//                        connectServer();
                         PAGE++;
                         spotAdapter.notifyDataSetChanged();
                         break;
                     case GET_FAIL:
+                        if(listMap.size()<1) {
+                            spotAdapter.removeEmptyView();
+                            View reloadLayout = LayoutInflater.from(getContext()).inflate(R.layout.load_reload, (ViewGroup) recyclerView.getParent(), false);
+                            reloadLayout.findViewById(R.id.load_reload_btn).setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    getAllOnlineDevicesByAppUserThread();
+                                }
+                            });
+                            spotAdapter.setReloadView(reloadLayout);
+                            Toast.makeText(getContext(), "没有在线的监控设备,点击按钮重试获取", Toast.LENGTH_SHORT).show();
+                        }else{
+                            spotAdapter.loadEnd();
+                        }
                         Log.e("Spot", "Get_FAIL", null);
                         break;
                     case TEMP:

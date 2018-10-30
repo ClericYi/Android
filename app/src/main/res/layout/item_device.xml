@@ -76,10 +76,11 @@
         android:layout_marginTop="5dp"
         android:layout_marginBottom="5dp"/>
 
-    <Switch
+    <View
         android:id="@+id/item_device_switch"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="25dp"
+        android:layout_height="25dp"
+        android:background="@drawable/check"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toTopOf="@id/item_device_send"
         app:layout_constraintEnd_toEndOf="parent"

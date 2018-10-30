@@ -38,7 +38,7 @@ class DetailCenterAcitity: AppCompatActivity(){
     private fun initTab() {
         detail_tabhost.setup(baseContext, supportFragmentManager, R.id.detail_maincontent)
         detail_tabhost.addTab(detail_tabhost.newTabSpec("设备信息").setIndicator("设备信息"), DetailFrag::class.java, null)
-        detail_tabhost.addTab(detail_tabhost.newTabSpec("数据监控").setIndicator("数据监控"), MqttFrag::class.java, null)
+        detail_tabhost.addTab(detail_tabhost.newTabSpec("数据监控").setIndicator("数据监控"), ChartFrag::class.java, null)
     }
 
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {

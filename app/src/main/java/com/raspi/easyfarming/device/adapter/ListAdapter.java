@@ -3,7 +3,7 @@ package com.raspi.easyfarming.device.adapter;
 import android.content.Context;
 import android.util.Log;
 import android.view.View;
-import android.widget.Switch;
+import android.widget.ImageView;
 
 import com.othershe.baseadapter.ViewHolder;
 import com.othershe.baseadapter.base.CommonBaseAdapter;
@@ -27,8 +27,28 @@ public class ListAdapter extends CommonBaseAdapter<Map> {
     protected void convert(ViewHolder viewHolder, Map map, int i) {
         viewHolder.setText(R.id.item_device_name, map.get("name").toString());
         viewHolder.setText(R.id.item_device_description, map.get("lastActiveDate").toString());
-        ((Switch)viewHolder.getView(R.id.item_device_switch)).setChecked((boolean)map.get("isOnline"));
+        viewHolder.getView(R.id.item_device_switch).setBackground((boolean)map.get("isOnline")?mContext.getDrawable(R.drawable.ic_online_check_true):mContext.getDrawable(R.drawable.ic_online_check_false));
         viewHolder.getView(R.id.item_device_rb).setVisibility(isShow?View.VISIBLE:View.GONE);
+        switch (map.get("deviceType").toString()) {
+            case "TEMP":
+                ((ImageView)viewHolder.getView(R.id.item_device_img)).setImageDrawable(mContext.getDrawable(R.drawable.ic_temp));
+                break;
+            case "HUMID":
+                ((ImageView)viewHolder.getView(R.id.item_device_img)).setImageDrawable(mContext.getDrawable(R.drawable.ic_humid));
+                break;
+            case "PRESSURE":
+                ((ImageView)viewHolder.getView(R.id.item_device_img)).setImageDrawable(mContext.getDrawable(R.drawable.ic_pressure));
+                break;
+            case "RAIN":
+                ((ImageView)viewHolder.getView(R.id.item_device_img)).setImageDrawable(mContext.getDrawable(R.drawable.ic_rain));
+                break;
+            case "ILLUMINANCE":
+                ((ImageView)viewHolder.getView(R.id.item_device_img)).setImageDrawable(mContext.getDrawable(R.drawable.ic_ill));
+                break;
+            case "LIVE":
+                ((ImageView)viewHolder.getView(R.id.item_device_img)).setImageDrawable(mContext.getDrawable(R.drawable.ic_spot));
+                break;
+        }
     }
 
     @Override

@@ -88,7 +88,7 @@ public class DeviceFrag extends Fragment {
     private List<String> groups;
     private List<String> groupName;
     private List<String> groupNum;
-
+    private int getSize = 0 ;
     private boolean isShow = false;
 
 
@@ -98,6 +98,7 @@ public class DeviceFrag extends Fragment {
 
     //Handler
     private Handler handler;
+
 
     @Nullable
     @Override
@@ -145,6 +146,7 @@ public class DeviceFrag extends Fragment {
                     }else {
                         devices.clear();
                         List<Map> result_devices = JSONArray.parseArray(getResult, Map.class);
+                        getSize = result_devices.size();
                         devices.addAll(result_devices);
                         handler.sendEmptyMessage(GETALLDEVICE_SUCCESS);
                     }
@@ -188,6 +190,7 @@ public class DeviceFrag extends Fragment {
                         return;
                     }else {
                         List<Map> result_devices = JSONArray.parseArray(getResult, Map.class);
+                        getSize = result_devices.size();
                         devices.addAll(result_devices);
                         handler.sendEmptyMessage(GETALLDEVICE_SUCCESS);
                     }
@@ -448,6 +451,8 @@ public class DeviceFrag extends Fragment {
                         .show();
             }
         });
+
+
     }
 
     /**
@@ -472,10 +477,8 @@ public class DeviceFrag extends Fragment {
                 super.onScrollStateChanged(recyclerView, newState);
                 LinearLayoutManager manager = (LinearLayoutManager) device_rv.getLayoutManager();
                 if (newState == RecyclerView.SCROLL_STATE_IDLE) {
-                    groupSpinner.setVisibility(View.GONE);
                     //获取最后一个完全显示的ItemPosition ,角标值
                     int lastVisibleItem = manager.findLastCompletelyVisibleItemPosition();
-                    int firstVisibleItem = manager.findFirstCompletelyVisibleItemPosition();
                     //所有条目,数量值
                     int totalItemCount = devices.size();
                     Log.e(TAG, "下拉加载", null);
@@ -607,7 +610,20 @@ public class DeviceFrag extends Fragment {
                         Log.e(TAG, "获取所有设备成功", null);
                         break;
                     case GETALLDEVICE_FAIL:
-                        listAdapter.loadEnd();
+                        if(devices.size()<0) {
+                            listAdapter.removeEmptyView();
+                            final View reloadLayout = LayoutInflater.from(getContext()).inflate(R.layout.load_reload, (ViewGroup) device_rv.getParent(), false);
+                            reloadLayout.findViewById(R.id.load_reload_btn).setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    getAllDevicesThread();
+                                }
+                            });
+                            listAdapter.setReloadView(reloadLayout);
+                            Toast.makeText(getContext(), "该群组没有设备了,点击按钮重试", Toast.LENGTH_SHORT).show();
+                        }else{
+                            listAdapter.loadEnd();
+                        }
                         break;
                     case GETALLDEVICE_ERROR:
                         Log.e(TAG, "获取所有设备失败", null);

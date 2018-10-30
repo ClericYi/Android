@@ -1,5 +1,6 @@
 package com.raspi.easyfarming.user.view;
 
+import android.content.Context;
 import android.content.IntentFilter;
 import android.net.ConnectivityManager;
 import android.os.Bundle;
@@ -18,10 +19,12 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.Switch;
 import android.widget.Toast;
 
 import com.alibaba.fastjson.JSONArray;
 import com.othershe.baseadapter.ViewHolder;
+import com.othershe.baseadapter.interfaces.OnItemChildClickListener;
 import com.othershe.baseadapter.interfaces.OnItemClickListener;
 import com.raspi.easyfarming.R;
 import com.raspi.easyfarming.user.adapter.TriggersAdapter;
@@ -53,7 +56,6 @@ public class TriggersActivity extends AppCompatActivity {
 
     //数据
     private List<Map> triggers;
-    private int getSize = 0;
 
     //适配器
     private TriggersAdapter triggersAdapter;
@@ -66,6 +68,10 @@ public class TriggersActivity extends AppCompatActivity {
 
     //广播
     private NetBroadcastReceiver netBroadcastReceiver;
+
+    public TriggersActivity(){
+
+    }
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -114,7 +120,6 @@ public class TriggersActivity extends AppCompatActivity {
                         return;
                     }
                     List<Map> map = JSONArray.parseArray(data, Map.class);
-                    getSize = map.size();
                     triggers.addAll(map);
                     handler.sendEmptyMessage(GETALLTRIGGERS_SUCCESS);
 
@@ -165,7 +170,7 @@ public class TriggersActivity extends AppCompatActivity {
      * 更改触发器状态
      * @param id
      */
-    private void changeStatueThread(final String id){
+    public void changeStatueThread(final String id){
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -254,9 +259,23 @@ public class TriggersActivity extends AppCompatActivity {
                         Toast.makeText(self, "获取错误", Toast.LENGTH_SHORT).show();
                         break;
                     case GETALLTRIGGERS_FAIL:
+                        if(triggers.size()<0){
+                            triggersAdapter.removeEmptyView();
+                            View reloadLayout = LayoutInflater.from(getBaseContext()).inflate(R.layout.load_reload, (ViewGroup) trigger_rv.getParent(), false);
+                            reloadLayout.findViewById(R.id.load_reload_btn).setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    getAllTriggerThread();
+                                }
+                            });
+                            triggersAdapter.setReloadView(reloadLayout);
+                            Toast.makeText(getBaseContext(), "未寻找到您的触发器，点击按钮重试获取", Toast.LENGTH_SHORT).show();
+                        }else{
+                            triggersAdapter.loadEnd();
+                        }
                         break;
                     case GETALLTRIGGERS_SUCCESS:
-                        if(getSize < Size){
+                        if(triggers.size()%Size!=0){
                             triggersAdapter.loadEnd();
                         }
                         Page++;
@@ -264,12 +283,15 @@ public class TriggersActivity extends AppCompatActivity {
                         Toast.makeText(self, "触发器获取成功", Toast.LENGTH_SHORT).show();
                         break;
                     case CHANGESTATE_ERROR:
+                        Log.e(TAG, "CHANGESTATE_ERROR", null);
                         break;
                     case CHANGESTATE_FAIL:
+                        Log.e(TAG, "CHANGESTATE_FAIL", null);
                         Toast.makeText(self, "触发器状态更改失败", Toast.LENGTH_SHORT).show();
                         break;
                     case CHANGESTATE_SUCCESS:
-                        Toast.makeText(self, "触发器状态更改成功", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(self, "触发器状态更改成功",Toast.LENGTH_SHORT).show();
+                        getAllTriggerThread();
                         break;
 
                 }
@@ -290,23 +312,12 @@ public class TriggersActivity extends AppCompatActivity {
         triggersAdapter.setEmptyView(emptyView);
         triggersAdapter.setLoadingView(R.layout.load_loading);
         triggersAdapter.setLoadEndView(R.layout.load_end);
-        triggersAdapter.setOnItemClickListener(new OnItemClickListener<Map>() {
+        triggersAdapter.setOnItemChildClickListener(R.id.item_trigger_switch, new OnItemChildClickListener<Map>() {
             @Override
-            public void onItemClick(ViewHolder viewHolder, final Map map, int i) {
-                final int[] Spot = {0};
-                viewHolder.getView(R.id.item_trigger_switch).setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        Spot[0] = 1;
-                        changeStatueThread(map.get("deviceScopeId").toString());
-                    }
-                });
-                if(Spot[0]==0){
-
-                }
+            public void onItemChildClick(ViewHolder viewHolder, Map map, int i) {
+                changeStatueThread(map.get("deviceScopeId").toString());
             }
         });
-
         trigger_rv.setAdapter(triggersAdapter);
 
 

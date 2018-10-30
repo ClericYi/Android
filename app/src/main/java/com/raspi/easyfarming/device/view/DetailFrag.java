@@ -135,11 +135,11 @@ public class DetailFrag extends Fragment {
                 for(int i = 0; i<baseTitle.length; i++) {
                     Map map1 = new HashMap();
                     if(i == 0 ) {
-                        map1.put("text", map.get("openId").toString());
+                        map1.put("text", CheckNull(map.get("openId")));
                     }else if(i == 1){
-                        map1.put("text", map.get("name").toString());
+                        map1.put("text", CheckNull(map.get("name")));
                     }else if(i == 2){
-                        map1.put("text", map.get("isOnline").toString());
+                        map1.put("text", CheckNull(map.get("isOnline")));
                     }
                     map1.put("title", baseTitle[i]);
                     baseListMaps.add(map1);
@@ -155,22 +155,30 @@ public class DetailFrag extends Fragment {
                 for(int i = 0; i<moreTitle.length; i++) {
                     Map map1 = new HashMap();
                     if(i == 0 ) {
-                        map1.put("text", map.get("describe").toString());
+                        map1.put("text", CheckNull(map.get("describe")));
                     }else if(i == 1){
-                        map1.put("text", parseObject(map.get("location").toString()).get("describe").toString());
+                        map1.put("text", CheckNull(parseObject(map.get("location").toString()).get("describe")));
                     }else if(i == 2){
-                        map1.put("text", parseObject(map.get("location").toString()).get("longitude").toString());
+                        map1.put("text", CheckNull(parseObject(map.get("location").toString()).get("longitude")));
                     }else if(i == 3 ) {
-                        map1.put("text", parseObject(map.get("location").toString()).get("latitude").toString());
+                        map1.put("text", CheckNull(parseObject(map.get("location").toString()).get("latitude")));
                     }else if(i == 4){
-                        map1.put("text", parseObject(map.get("group").toString()).get("name").toString());
+                        map1.put("text", CheckNull(parseObject(map.get("group").toString()).get("name")));
                     }else if(i == 5){
-                        map1.put("text", parseObject(map.get("group").toString()).get("comment").toString());
+                        map1.put("text", CheckNull(parseObject(map.get("group").toString()).get("comment")));
                     }
                     map1.put("title", moreTitle[i]);
                     moreListMaps.add(map1);
                 }
             }
+
+            private String CheckNull(Object text){
+                if(text == null)
+                    return "无信息";
+                else
+                    return text.toString();
+            }
+
         }).start();
     }
 
@@ -233,7 +241,6 @@ public class DetailFrag extends Fragment {
                     case DEVICE_SUCCESS:
                         deviceDetailListAdapter.notifyDataSetChanged();
                         deviceDetailOtherListAdapter.notifyDataSetChanged();
-                        Toast.makeText(getContext(),"以上是查询到的数据", Toast.LENGTH_SHORT ).show();
                         break;
                     case DEVICE_FAIL:
                         Toast.makeText(getContext(),"没有查询到数据", Toast.LENGTH_SHORT ).show();
@@ -246,11 +253,4 @@ public class DetailFrag extends Fragment {
             }
         });
     }
-
-
-
-
-
-
-
 }

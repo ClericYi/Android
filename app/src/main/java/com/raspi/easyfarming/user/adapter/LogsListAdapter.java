@@ -25,9 +25,9 @@ public class LogsListAdapter extends CommonBaseAdapter<Map> {
 
     @Override
     protected void convert(ViewHolder viewHolder, Map map, int i) {
-        viewHolder.setText(R.id.item_logs_date, map.get("date").toString());
-        viewHolder.setText(R.id.item_logs_device, map.get("deviceId").toString());
-        viewHolder.setText(R.id.item_logs_do, map.get("deviceId").toString().equals("CONNECT")?"上线":"下线");
+        viewHolder.setText(R.id.item_logs_date, "日期:"+map.get("date").toString());
+        viewHolder.setText(R.id.item_logs_device, "设备号:"+map.get("deviceId").toString());
+        viewHolder.getView(R.id.item_logs_do).setBackground( map.get("deviceId").toString().equals("CONNECT")?mContext.getDrawable(R.drawable.ic_online_check_true):mContext.getDrawable(R.drawable.ic_online_check_false));
     }
 
     @Override
