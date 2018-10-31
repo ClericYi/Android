@@ -610,7 +610,7 @@ public class DeviceFrag extends Fragment {
                         Log.e(TAG, "获取所有设备成功", null);
                         break;
                     case GETALLDEVICE_FAIL:
-                        if(devices.size()<0) {
+                        if(devices.size()<1) {
                             listAdapter.removeEmptyView();
                             final View reloadLayout = LayoutInflater.from(getContext()).inflate(R.layout.load_reload, (ViewGroup) device_rv.getParent(), false);
                             reloadLayout.findViewById(R.id.load_reload_btn).setOnClickListener(new View.OnClickListener() {

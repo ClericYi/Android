@@ -29,7 +29,7 @@ public class ListAdapter extends CommonBaseAdapter<Map> {
         viewHolder.setText(R.id.item_device_description, map.get("lastActiveDate").toString());
         viewHolder.getView(R.id.item_device_switch).setBackground((boolean)map.get("isOnline")?mContext.getDrawable(R.drawable.ic_online_check_true):mContext.getDrawable(R.drawable.ic_online_check_false));
         viewHolder.getView(R.id.item_device_rb).setVisibility(isShow?View.VISIBLE:View.GONE);
-        switch (map.get("deviceType").toString()) {
+        switch (CheckNull(map.get("deviceType"))) {
             case "TEMP":
                 ((ImageView)viewHolder.getView(R.id.item_device_img)).setImageDrawable(mContext.getDrawable(R.drawable.ic_temp));
                 break;
@@ -48,8 +48,20 @@ public class ListAdapter extends CommonBaseAdapter<Map> {
             case "LIVE":
                 ((ImageView)viewHolder.getView(R.id.item_device_img)).setImageDrawable(mContext.getDrawable(R.drawable.ic_spot));
                 break;
+            case "DEVICE":
+                ((ImageView)viewHolder.getView(R.id.item_device_img)).setImageDrawable(mContext.getDrawable(R.drawable.ic_device_self));
+                break;
         }
     }
+
+    private String CheckNull(Object text){
+        if(text==null)
+            return "DEVICE";
+        else
+            return text.toString();
+    }
+
+
 
     @Override
     protected int getItemLayoutId() {

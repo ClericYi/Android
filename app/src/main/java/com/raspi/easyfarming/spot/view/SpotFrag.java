@@ -1,6 +1,7 @@
 package com.raspi.easyfarming.spot.view;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -17,6 +18,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import com.othershe.baseadapter.ViewHolder;
+import com.othershe.baseadapter.interfaces.OnItemClickListener;
 import com.raspi.easyfarming.R;
 import com.raspi.easyfarming.spot.adapter.SpotAdapter;
 import com.raspi.easyfarming.utils.okhttp.okHttpClientModel;
@@ -391,7 +394,16 @@ public class SpotFrag extends Fragment {
         spotAdapter.setEmptyView(emptyView);
         spotAdapter.setLoadingView(R.layout.load_loading);
         spotAdapter.setLoadEndView(R.layout.load_end);
-
+        spotAdapter.setOnItemClickListener(new OnItemClickListener<Map>() {
+            @Override
+            public void onItemClick(ViewHolder viewHolder, Map map, int i) {
+                if(map.get("type").toString().equals("LIVE")){
+                    Intent intent = new Intent(getContext(), VideoActivity.class);
+                    intent.putExtra("id", map.get("id").toString());
+                    startActivity(intent);
+                }
+            }
+        });
 
         recyclerView.setAdapter(spotAdapter);
         //设置样式
@@ -419,8 +431,8 @@ public class SpotFrag extends Fragment {
                     case GET_SUCCESS:
                         //初始化
                         Log.e("Spot", "Success", null);
-//                        initSDK(getContext(), RECENVETOPICFORMAT);
-//                        connectServer();
+                        initSDK(getContext(), RECENVETOPICFORMAT);
+                        connectServer();
                         PAGE++;
                         spotAdapter.notifyDataSetChanged();
                         break;
