@@ -11,7 +11,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.raspi.easyfarming.R;
-import com.raspi.easyfarming.onestackconfig.activity.WifiConnectActivity;
+import com.raspi.easyfarming.user.view.WifiConnectActivity;
 import com.raspi.easyfarming.user.view.LogsActivity;
 import com.raspi.easyfarming.user.view.TriggersActivity;
 

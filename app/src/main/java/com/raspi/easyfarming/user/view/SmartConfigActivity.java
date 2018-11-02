@@ -1,4 +1,4 @@
-package com.raspi.easyfarming.onestackconfig.activity;
+package com.raspi.easyfarming.user.view;
 
 
 
@@ -22,7 +22,7 @@ import com.esp.smartconfig.SimpleDialogTask;
 import com.esp.smartconfig.SweetDialogActivity;
 import com.esp.smartconfig.sweet.OnDismissCallbackListener;
 import com.raspi.easyfarming.R;
-import com.raspi.easyfarming.onestackconfig.utils.PreferenceUtil;
+import com.raspi.easyfarming.utils.PreferenceUtil;
 
 import java.util.List;
 

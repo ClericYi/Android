@@ -1,4 +1,4 @@
-package com.raspi.easyfarming.onestackconfig.activity;
+package com.raspi.easyfarming.user.view;
 
 import android.os.Build;
 import android.os.Bundle;

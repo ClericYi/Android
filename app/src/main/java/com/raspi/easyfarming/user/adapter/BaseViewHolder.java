@@ -1,4 +1,4 @@
-package com.raspi.easyfarming.onestackconfig.adapter;
+package com.raspi.easyfarming.user.adapter;
 
 import android.content.Context;
 import android.util.SparseArray;

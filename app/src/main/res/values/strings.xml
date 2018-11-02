@@ -17,6 +17,9 @@
     <string name="URL_Device_getAllDevicesByGroup">http://39.108.153.134/api/user/getAllDevicesByGroup/</string>
     <string name="URL_Device_createDevice">http://39.108.153.134/api/user/createADevice</string>
     <string name="URL_Data_Day">http://39.108.153.134/api/device/getDeviceRecordByToday/1532616577046</string>
+    <string name="URL_Video_M3u8">http://39.108.153.134/api/device/getM3u8LiveUrlByDevice/</string>
+    <string name="URL_Video_Rtmp">http://39.108.153.134/api/device/getPushLiveUrlByDevice/</string>
+    <string name="URL_Video_Start">http://39.108.153.134/api/api/v1/sendCmdToDevice</string>
 
     <!-- 登录 -->
     <string name="login_next">登录</string>

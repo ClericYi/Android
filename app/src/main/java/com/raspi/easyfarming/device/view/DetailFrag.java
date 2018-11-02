@@ -1,11 +1,18 @@
 package com.raspi.easyfarming.device.view;
 
+import android.Manifest;
 import android.content.Context;
+import android.content.pm.PackageManager;
+import android.location.Criteria;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.DividerItemDecoration;
@@ -18,6 +25,8 @@ import android.view.ViewGroup;
 
 import android.widget.Toast;
 
+import com.blankj.utilcode.util.LogUtils;
+import com.blankj.utilcode.util.ToastUtils;
 import com.raspi.easyfarming.R;
 import com.raspi.easyfarming.device.adapter.DetailListAdapter;
 import com.raspi.easyfarming.device.adapter.DetailOtherListAdapter;
@@ -49,6 +58,7 @@ public class DetailFrag extends Fragment {
             R.string.device_detail_name,
             R.string.device_detail_online
     };
+
 
     private int[] moreTitle = {
             R.string.device_detail_description,

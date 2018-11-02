@@ -1,8 +1,8 @@
-package com.raspi.easyfarming.onestackconfig.base;
+package com.raspi.easyfarming.utils.base;
 
 import android.app.Application;
 
-import com.raspi.easyfarming.onestackconfig.utils.PreferenceUtil;
+import com.raspi.easyfarming.utils.PreferenceUtil;
 
 public class MyApplication extends Application {
 

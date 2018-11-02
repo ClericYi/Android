@@ -1,4 +1,4 @@
-package com.raspi.easyfarming.onestackconfig.activity;
+package com.raspi.easyfarming.user.view;
 
 import android.Manifest;
 import android.content.BroadcastReceiver;
@@ -17,7 +17,7 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import com.raspi.easyfarming.R;
-import com.raspi.easyfarming.onestackconfig.adapter.WifiListAdapter;
+import com.raspi.easyfarming.user.adapter.WifiListAdapter;
 import com.tbruyelle.rxpermissions.RxPermissions;
 
 import java.util.ArrayList;

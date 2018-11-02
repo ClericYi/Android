@@ -1,4 +1,4 @@
-package com.raspi.easyfarming.onestackconfig.utils;
+package com.raspi.easyfarming.utils;
 
 import android.content.Context;
 import android.content.SharedPreferences;

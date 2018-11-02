@@ -378,17 +378,19 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void run() {
                 sendSimplestNotificationWithAction();
-
-
             }
         });
     }
 
+
+    /**************************************** 消息通知 ******************************************/
+    /**
+     * 通知实现
+     */
     private void sendSimplestNotificationWithAction() {
         if(Build.VERSION.SDK_INT>=26){
             createChannel();
         }
-
         Intent intent = new Intent(this, MainActivity.class);
         PendingIntent pi = PendingIntent.getActivity(this, 0, intent, 0);
         Notification notification = new NotificationCompat.Builder(this, "channel_01")
@@ -404,6 +406,9 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    /**
+     * 用于兼容不同版本
+     */
     @RequiresApi(api=26)
     public void createChannel(){
         NotificationManager manager = (NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);

@@ -25,20 +25,36 @@ import com.shuyu.gsyvideoplayer.listener.LockClickListener;
 import com.shuyu.gsyvideoplayer.utils.OrientationUtils;
 import com.shuyu.gsyvideoplayer.video.base.GSYVideoPlayer;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import okhttp3.MediaType;
 import okhttp3.Request;
+import okhttp3.RequestBody;
 import okhttp3.Response;
 
 import static com.alibaba.fastjson.JSON.parseObject;
+import static com.alibaba.fastjson.JSON.toJSONString;
 
 public class VideoActivity extends AppCompatActivity {
 
     //常量
     private final String TAG = "VideoActivity";
+    private final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
     private final int GET_SUCCESS = 0;
     private final int GET_FAIL = 1;
     private final int GET_ERROR = 2;
+    private final int START_SUCCESS = 3;
+    private final int START_FAIL = 4;
+    private final int START_ERROR = 5;
+    private final int RTMP_SUCCESS = 6;
+    private final int RTMP_FAIL = 7;
+    private final int RTMP_ERROR = 8;
+    private final int STOP_SUCCESS = 9;
+    private final int STOP_FAIL = 10;
+    private final int STOP_ERROR = 11;
 
     //控件
     @BindView(R.id.video_nested_scroll)
@@ -67,28 +83,34 @@ public class VideoActivity extends AppCompatActivity {
         initDialog();//初始化弹窗
         initObject();//初始化数据
         initThread();//初始化线程
+        initClick();//初始化点击事件
     }
 
-    /**
-     * 初始化数据
-     */
-    private void initObject() {
-        Intent intent = getIntent();
-        if(intent!=null&& intent.hasExtra("id")){
-            id = intent.getStringExtra("id");
-        }
-    }
+
 
 
     /******************************** 线程 *******************************************/
 
-    private void getUrlThread(){
+    /**
+     * 关闭设备视频
+     */
+    private void stopVideoThread() {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                try{
+                try {
+                    Map<String, String> payload = new HashMap<>();
+                    payload.put("stop", url);
+
+                    Map<String, String> map = new HashMap<>();
+                    map.put("deviceId", id);
+                    map.put("payload", toJSONString(payload));
+
+                    RequestBody requestBody = RequestBody.create(JSON, toJSONString(map));
+
                     Request request = new Request.Builder()
-                            .url(getResources().getString(R.string.URL_Device_getAllDevicesByGroup))
+                            .post(requestBody)
+                            .url(getResources().getString(R.string.URL_Video_Start))
                             .build();
 
                     Response response = okHttpClientModel.INSTANCE.getMOkHttpClient().newCall(request).execute();
@@ -99,7 +121,81 @@ public class VideoActivity extends AppCompatActivity {
                     String state = parseObject(result).get("state").toString();
 
                     if(state.equals("1")){
-                        url = parseObject(parseObject(result).get("data").toString()).get("pushLiveUrl").toString();
+                        handler.sendEmptyMessage(STOP_SUCCESS);
+                    }else {
+                        handler.sendEmptyMessage(STOP_FAIL);
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    handler.sendEmptyMessage(STOP_ERROR);
+                }
+            }
+        }).start();
+    }
+
+
+    /**
+     * 开启设备视频
+     */
+    private void startVideoThread() {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    Map<String, String> payload = new HashMap<>();
+                    payload.put("start", url);
+
+                    Map<String, String> map = new HashMap<>();
+                    map.put("deviceId", id);
+                    map.put("payload", toJSONString(payload));
+
+                    RequestBody requestBody = RequestBody.create(JSON, toJSONString(map));
+
+                    Request request = new Request.Builder()
+                            .post(requestBody)
+                            .url(getResources().getString(R.string.URL_Video_Start))
+                            .build();
+
+                    Response response = okHttpClientModel.INSTANCE.getMOkHttpClient().newCall(request).execute();
+
+                    String result = response.body().string();
+                    Log.e(TAG, result, null);
+
+                    String state = parseObject(result).get("state").toString();
+
+                    if(state.equals("1")){
+                        handler.sendEmptyMessage(START_SUCCESS);
+                    }else {
+                        handler.sendEmptyMessage(START_FAIL);
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    handler.sendEmptyMessage(START_ERROR);
+                }
+            }
+        }).start();
+    }
+
+
+
+    private void getM3u8UrlThread(){
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try{
+                    Request request = new Request.Builder()
+                            .url(getResources().getString(R.string.URL_Video_M3u8)+id)
+                            .build();
+
+                    Response response = okHttpClientModel.INSTANCE.getMOkHttpClient().newCall(request).execute();
+
+                    String result = response.body().string();
+                    Log.e(TAG, result, null);
+
+                    String state = parseObject(result).get("state").toString();
+
+                    if(state.equals("1")){
+                        url = parseObject(parseObject(result).get("data").toString()).get("liveUrl").toString();
                         handler.sendEmptyMessage(GET_SUCCESS);
                     }else {
                         handler.sendEmptyMessage(GET_FAIL);
@@ -112,9 +208,69 @@ public class VideoActivity extends AppCompatActivity {
         }).start();
     }
 
+    private void getRtmpUrlThread(){
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try{
+                    Request request = new Request.Builder()
+                            .url(getResources().getString(R.string.URL_Video_Rtmp)+id)
+                            .build();
+
+                    Response response = okHttpClientModel.INSTANCE.getMOkHttpClient().newCall(request).execute();
+
+                    String result = response.body().string();
+                    Log.e(TAG, result, null);
+
+                    String state = parseObject(result).get("state").toString();
+
+                    if(state.equals("1")){
+                        url = parseObject(parseObject(result).get("data").toString()).get("pushLiveUrl").toString();
+                        handler.sendEmptyMessage(RTMP_SUCCESS);
+                    }else {
+                        handler.sendEmptyMessage(RTMP_FAIL);
+                    }
+                }catch (Exception e){
+                    e.printStackTrace();
+                    handler.sendEmptyMessage(RTMP_ERROR);
+                }
+            }
+        }).start();
+    }
+
+
 
 
     /******************************** 初始化  ****************************************/
+
+
+    /**
+     * 初始化点击事件
+     */
+    private void initClick() {
+        detailPlayer.getBackButton().setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (GSYVideoManager.backFromWindowFull(getBaseContext())) {
+                    orientationUtils.backToProtVideo();
+                    return;
+                }else{
+                    finish();
+                }
+            }
+        });
+    }
+
+
+    /**
+     * 初始化数据
+     */
+    private void initObject() {
+        Intent intent = getIntent();
+        if(intent!=null&& intent.hasExtra("id")){
+            id = intent.getStringExtra("id");
+        }
+    }
 
     /**
      * 初始化弹窗
@@ -129,8 +285,9 @@ public class VideoActivity extends AppCompatActivity {
      * 初始化线程
      */
     private void initThread() {
-        getUrlThread();
+        getRtmpUrlThread();
     }
+
 
     /**
      * 初始化视频播放
@@ -151,7 +308,7 @@ public class VideoActivity extends AppCompatActivity {
                 .setSeekRatio(1)
                 .setUrl(url)
                 .setCacheWithPlay(true)
-                .setVideoTitle("测试视频")
+                .setVideoTitle("视频监控")
                 .setVideoAllCallBack(new GSYSampleCallBack() {
                     @Override
                     public void onPrepared(String url, Object... objects) {
@@ -198,7 +355,6 @@ public class VideoActivity extends AppCompatActivity {
         if (orientationUtils != null) {
             orientationUtils.backToProtVideo();
         }
-
         if (GSYVideoManager.backFromWindowFull(this)) {
             return;
         }
@@ -208,6 +364,7 @@ public class VideoActivity extends AppCompatActivity {
 
     @Override
     protected void onPause() {
+        stopVideoThread();
         getCurPlay().onVideoPause();
         super.onPause();
         isPause = true;
@@ -215,6 +372,7 @@ public class VideoActivity extends AppCompatActivity {
 
     @Override
     protected void onResume() {
+        startVideoThread();
         getCurPlay().onVideoResume();
         super.onResume();
         isPause = false;
@@ -226,6 +384,7 @@ public class VideoActivity extends AppCompatActivity {
         if (isPlay) {
             getCurPlay().release();
         }
+        stopVideoThread();
         //GSYPreViewManager.instance().releaseMediaPlayer();
         if (orientationUtils != null)
             orientationUtils.releaseListener();
@@ -269,6 +428,35 @@ public class VideoActivity extends AppCompatActivity {
                 case GET_ERROR:
                     dialog.dismiss();
                     Log.e(TAG, "GET_ERROR", null);
+                    break;
+                case START_ERROR:
+                    Log.e(TAG, "START_ERROR", null);
+                    break;
+                case START_FAIL:
+                    Log.e(TAG, "START_FAIL", null);
+                    break;
+                case START_SUCCESS:
+                    getM3u8UrlThread();
+                    Log.e(TAG, "START_SUCCESS", null);
+                    break;
+                case RTMP_ERROR:
+                    Log.e(TAG, "RTMP_ERROR", null);
+                    break;
+                case RTMP_FAIL:
+                    Log.e(TAG, "RTMP_FAIL", null);
+                    break;
+                case RTMP_SUCCESS:
+                    startVideoThread();
+                    Log.e(TAG, "RTMP_SUCCESS", null);
+                    break;
+                case STOP_SUCCESS:
+                    Log.e(TAG, "STOP_SUCCESS", null);
+                    break;
+                case STOP_FAIL:
+                    Log.e(TAG, "STOP_FAIL", null);
+                    break;
+                case STOP_ERROR:
+                    Log.e(TAG, "STOP_ERROR", null);
                     break;
             }
             return false;

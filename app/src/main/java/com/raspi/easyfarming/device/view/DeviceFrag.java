@@ -1,12 +1,20 @@
 package com.raspi.easyfarming.device.view;
 
+import android.Manifest;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.location.Criteria;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -26,11 +34,13 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.alibaba.fastjson.JSONArray;
+import com.blankj.utilcode.util.LogUtils;
+import com.blankj.utilcode.util.ToastUtils;
 import com.othershe.baseadapter.ViewHolder;
 import com.othershe.baseadapter.interfaces.OnItemClickListener;
-import com.othershe.baseadapter.interfaces.OnLoadMoreListener;
 import com.raspi.easyfarming.R;
 import com.raspi.easyfarming.device.adapter.ListAdapter;
+import com.raspi.easyfarming.utils.LocationUtils;
 import com.raspi.easyfarming.utils.okhttp.okHttpClientModel;
 
 import org.angmarch.views.NiceSpinner;
@@ -67,6 +77,7 @@ public class DeviceFrag extends Fragment {
     private final int ADDDEVICE_SUCCESS = 15;
     private final int ADDDEVICE_FAIL = 16;
     private final int ADDDEVICE_ERROR = 17;
+    private final int GETLOCAL_FAIL = 18;
 
 
 
@@ -90,6 +101,8 @@ public class DeviceFrag extends Fragment {
     private List<String> groupNum;
     private int getSize = 0 ;
     private boolean isShow = false;
+    private String longitude="0";
+    private String latitude="0";
 
 
     //适配器
@@ -104,6 +117,7 @@ public class DeviceFrag extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.from(getContext()).inflate(R.layout.frag_device_list, container, false);
+        gps();
         initView(view);//初始化控件
         initList();//初始化列表
         initHandler();//初始化Handler
@@ -294,14 +308,19 @@ public class DeviceFrag extends Fragment {
      * @param groupId
      * @param local
      * @param type
+     * @param locationText
      */
-    private void createDeviceThread(final String name, final String comment, final String groupId, final String local, final String type){
+    private void createDeviceThread(final String name, final String comment, final String groupId, final String local, final String type, final String locationText){
         new Thread(new Runnable() {
             @Override
             public void run() {
                 try {
                     if(name.equals("")||comment.equals("")||local.equals("")||type.equals("")||groupId.equals("")){
                         handler.sendEmptyMessage(ADDDEVICE_FAIL);
+                        return;
+                    }
+                    if(longitude.equals("0")||latitude.equals("0")){
+                        handler.sendEmptyMessage(GETLOCAL_FAIL);
                         return;
                     }
 
@@ -311,8 +330,8 @@ public class DeviceFrag extends Fragment {
                     map.put("deviceType", type);
                     map.put("groupId", groupId);
                     map.put("locationDescribe", local);
-                    map.put("latitude", "39.53");
-                    map.put("longitude", "116.23");
+                    map.put("latitude", latitude);
+                    map.put("longitude", longitude);
 
                     Log.e(TAG, toJSONString(map),null);
 
@@ -396,6 +415,7 @@ public class DeviceFrag extends Fragment {
      * 初始化点击事件
      */
     private void initOnClick() {
+
         //编辑设备
         device_edit.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -441,7 +461,8 @@ public class DeviceFrag extends Fragment {
                                         comment.getText().toString(),
                                         groupNum.get(spinner.getSelectedIndex()),
                                         local.getText().toString(),
-                                        type.getText().toString()
+                                        type.getText().toString(),
+                                        "1"
                                         );
                             }
 
@@ -669,10 +690,13 @@ public class DeviceFrag extends Fragment {
                         break;
                     case ADDDEVICE_FAIL:
                         Toast.makeText(getContext(), "设备添加失败", Toast.LENGTH_SHORT).show();
-                        Log.e(TAG, "获取所有分组失败", null);
+                        Log.e(TAG, "设备添加失败", null);
                         break;
                     case ADDDEVICE_ERROR:
                         Log.e(TAG, "设备添加失败", null);
+                        break;
+                    case GETLOCAL_FAIL:
+                        ToastUtils.showShort("请先打开您的定位");
                         break;
                 }
                 return false;
@@ -686,4 +710,66 @@ public class DeviceFrag extends Fragment {
         super.onResume();
         initThread();//初始化线程
     }
+
+    /************************************ 定位******************************************/
+    /**
+     *   实现GPS的方法
+     */
+
+    public void gps() {
+        //定义LocationManager对象
+        LocationManager locationManager = (LocationManager) getContext().getSystemService(Context.LOCATION_SERVICE);
+        //定义Criteria对象
+        Criteria criteria = new Criteria();
+        // 定位的精准度
+        criteria.setAccuracy(Criteria.ACCURACY_FINE);
+        // 海拔信息是否关注
+        criteria.setAltitudeRequired(false);
+        // 对周围的事情是否进行关心
+        criteria.setBearingRequired(false);
+        // 是否支持收费的查询
+        criteria.setCostAllowed(false);
+        // 是否耗电
+        criteria.setPowerRequirement(Criteria.POWER_LOW);
+        // 对速度是否关注
+        criteria.setSpeedRequired(false);
+
+        //得到最好的定位方式
+        String provider = locationManager.getBestProvider(criteria, true);
+
+        //注册监听
+        if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            ToastUtils.showShort("请先打开定位");
+            return;
+        }
+        locationManager.requestLocationUpdates(provider, 100000, 0, new DeviceFrag.MyLocationListener());
+    }
+
+    //实现监听接口
+    private final class MyLocationListener implements LocationListener {
+        @Override// 位置的改变
+        public void onLocationChanged(Location location) {
+            // TODO Auto-generated method stub
+            latitude = String.format("%.2f,",location.getLatitude());// 维度
+            longitude = String.format("%.2f,",location.getLongitude());// 经度
+            LogUtils.e(longitude,latitude);
+        }
+
+        @Override// gps卫星有一个没有找到
+        public void onStatusChanged(String provider, int status, Bundle extras) {
+            // TODO Auto-generated method stub
+        }
+
+        @Override// 某个设置被打开
+        public void onProviderEnabled(String provider) {
+            // TODO Auto-generated method stub
+        }
+
+        @Override// 某个设置被关闭
+        public void onProviderDisabled(String provider) {
+            // TODO Auto-generated method stub
+        }
+
+    }
+
 }

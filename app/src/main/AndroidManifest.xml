@@ -18,7 +18,7 @@
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
 
     <application
-        android:name=".onestackconfig.base.MyApplication"
+        android:name=".utils.base.MyApplication"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
@@ -26,7 +26,12 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
-        <activity android:name=".login.view.LoginActivity">
+        <activity android:name=".login.view.LoginActivity"
+            android:hardwareAccelerated="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
         </activity>
 
         <activity android:name=".main.view.MainActivity"
@@ -42,22 +47,20 @@
         <activity android:name=".device.view.DetailCenterAcitity"/>
 
         <!-- onestackconfig -->
-        <activity android:name=".onestackconfig.activity.WifiConnectActivity" >
+        <activity android:name=".user.view.WifiConnectActivity" >
 
         </activity>
 
-        <activity android:name=".onestackconfig.activity.SmartConfigActivity"
+        <activity android:name=".user.view.SmartConfigActivity"
             android:windowSoftInputMode="stateHidden|adjustResize"
             android:screenOrientation="portrait"/>
 
         <activity android:name=".spot.view.VideoActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:screenOrientation="portrait"
-            android:hardwareAccelerated="true">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
+            android:hardwareAccelerated="true"
+            android:theme="@style/VideoTheme">
+
         </activity>
 
 
