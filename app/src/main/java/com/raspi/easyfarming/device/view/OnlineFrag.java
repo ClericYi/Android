@@ -5,11 +5,16 @@ import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.constraint.ConstraintLayout;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AlphaAnimation;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
+import android.view.animation.ScaleAnimation;
 import android.widget.TextView;
 
 import com.raspi.easyfarming.R;
@@ -32,16 +37,22 @@ public class OnlineFrag extends Fragment {
     private TextView falseNum;
     private TextView trueNum;
     private TextView falseText;
+    private ConstraintLayout onlineTrue;
+    private ConstraintLayout onlineFalse;
 
     //数据
     private String falseNumResult;
     private String trueNumResult;
+
+    //动画
+    private ScaleAnimation anim;
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.from(getContext()).inflate(R.layout.frag_device_online, container, false);
         initView(view);//控件初始化
+        initAnim();//动画初始化
         return view;
     }
 
@@ -86,6 +97,18 @@ public class OnlineFrag extends Fragment {
 
 
     /**
+     * 动画初始化
+     */
+    private void initAnim() {
+        anim = new ScaleAnimation(0.0f, 1.1f, 0.0f, 1.1f,
+                Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
+        anim.setDuration(1000);
+        AnimationUtils.loadAnimation(getContext(),R.anim.online_scale);
+        onlineTrue.startAnimation(anim);
+        onlineFalse.startAnimation(anim);
+    }
+
+    /**
      * 初始化线程
      */
     private void initThread() {
@@ -100,7 +123,8 @@ public class OnlineFrag extends Fragment {
         falseNum = view.findViewById(R.id.online_false).findViewById(R.id.online_num);
         trueNum = view.findViewById(R.id.online_true).findViewById(R.id.online_num);
         falseText = view.findViewById(R.id.online_false).findViewById(R.id.online_text);
-
+        onlineFalse = view.findViewById(R.id.online_false);
+        onlineTrue = view.findViewById(R.id.online_true);
         falseText.setText(getContext().getResources().getString(R.string.device_outline));
         view.findViewById(R.id.online_true).setBackgroundDrawable(getContext().getResources().getDrawable(R.drawable.ic_device_online_true));
     }

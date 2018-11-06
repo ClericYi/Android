@@ -27,29 +27,42 @@ public class ListAdapter extends CommonBaseAdapter<Map> {
     protected void convert(ViewHolder viewHolder, Map map, int i) {
         viewHolder.setText(R.id.item_device_name, map.get("name").toString());
         viewHolder.setText(R.id.item_device_description, map.get("lastActiveDate").toString());
-        viewHolder.getView(R.id.item_device_switch).setBackground((boolean)map.get("isOnline")?mContext.getDrawable(R.drawable.ic_online_check_true):mContext.getDrawable(R.drawable.ic_online_check_false));
         viewHolder.getView(R.id.item_device_rb).setVisibility(isShow?View.VISIBLE:View.GONE);
         switch (CheckNull(map.get("deviceType"))) {
             case "TEMP":
-                ((ImageView)viewHolder.getView(R.id.item_device_img)).setImageDrawable(mContext.getDrawable(R.drawable.ic_temp));
+                ((ImageView)viewHolder.getView(R.id.item_device_img))
+                        .setImageDrawable((boolean)map.get("isOnline")?
+                                mContext.getDrawable(R.drawable.ic_temp_true):mContext.getDrawable(R.drawable.ic_temp_false));
                 break;
             case "HUMID":
-                ((ImageView)viewHolder.getView(R.id.item_device_img)).setImageDrawable(mContext.getDrawable(R.drawable.ic_humid));
+                ((ImageView)viewHolder.getView(R.id.item_device_img))
+                        .setImageDrawable((boolean)map.get("isOnline")?
+                                mContext.getDrawable(R.drawable.ic_humid_true):mContext.getDrawable(R.drawable.ic_humid_false));
                 break;
             case "PRESSURE":
-                ((ImageView)viewHolder.getView(R.id.item_device_img)).setImageDrawable(mContext.getDrawable(R.drawable.ic_pressure));
+                ((ImageView)viewHolder.getView(R.id.item_device_img)).
+                        setImageDrawable((boolean)map.get("isOnline")?
+                                mContext.getDrawable(R.drawable.ic_pressure_true):mContext.getDrawable(R.drawable.ic_pressure_false));
                 break;
             case "RAIN":
-                ((ImageView)viewHolder.getView(R.id.item_device_img)).setImageDrawable(mContext.getDrawable(R.drawable.ic_rain));
+                ((ImageView)viewHolder.getView(R.id.item_device_img))
+                        .setImageDrawable((boolean)map.get("isOnline")?
+                                mContext.getDrawable(R.drawable.ic_rain_true):mContext.getDrawable(R.drawable.ic_rain_false));
                 break;
             case "ILLUMINANCE":
-                ((ImageView)viewHolder.getView(R.id.item_device_img)).setImageDrawable(mContext.getDrawable(R.drawable.ic_ill));
+                ((ImageView)viewHolder.getView(R.id.item_device_img))
+                        .setImageDrawable((boolean)map.get("isOnline")?
+                                mContext.getDrawable(R.drawable.ic_ill_true):mContext.getDrawable(R.drawable.ic_ill_false));
                 break;
             case "LIVE":
-                ((ImageView)viewHolder.getView(R.id.item_device_img)).setImageDrawable(mContext.getDrawable(R.drawable.ic_spot));
+                ((ImageView)viewHolder.getView(R.id.item_device_img))
+                        .setImageDrawable((boolean)map.get("isOnline")?
+                                mContext.getDrawable(R.drawable.ic_spot_true):mContext.getDrawable(R.drawable.ic_spot_false));
                 break;
             case "DEVICE":
-                ((ImageView)viewHolder.getView(R.id.item_device_img)).setImageDrawable(mContext.getDrawable(R.drawable.ic_device_self));
+                ((ImageView)viewHolder.getView(R.id.item_device_img))
+                        .setImageDrawable((boolean)map.get("isOnline")?
+                                mContext.getDrawable(R.drawable.ic_device_self_true):mContext.getDrawable(R.drawable.ic_device_self_false));
                 break;
         }
     }

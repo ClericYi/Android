@@ -37,6 +37,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.blankj.utilcode.util.LogUtils;
 import com.blankj.utilcode.util.ToastUtils;
 import com.othershe.baseadapter.ViewHolder;
+import com.othershe.baseadapter.interfaces.OnItemChildClickListener;
 import com.othershe.baseadapter.interfaces.OnItemClickListener;
 import com.raspi.easyfarming.R;
 import com.raspi.easyfarming.device.adapter.ListAdapter;
@@ -78,8 +79,9 @@ public class DeviceFrag extends Fragment {
     private final int ADDDEVICE_FAIL = 16;
     private final int ADDDEVICE_ERROR = 17;
     private final int GETLOCAL_FAIL = 18;
-
-
+    private final int SENDCMD_SUCCESS = 19;
+    private final int SENDCMD_FAIL = 20;
+    private final int SENDCMD_ERROR = 21;
 
     public static final okhttp3.MediaType JSON
             = okhttp3.MediaType.parse("application/json; charset=UTF-8");
@@ -401,6 +403,48 @@ public class DeviceFrag extends Fragment {
     }
 
 
+    /**
+     * 发送指令
+     */
+    public void sendCmdToThread(final String data, final String deviceId){
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    Map<String, String> payload = new HashMap<String, String>();
+                    payload.put("cmd", data);
+                    Map<String, String> map = new HashMap<String, String>();
+                    map.put("payload", toJSONString(payload));
+                    map.put("deviceId", deviceId);
+
+                    RequestBody body = RequestBody.create(JSON, toJSONString(map));
+
+
+                    Request request = new Request.Builder()
+                            .url(getContext().getResources().getString(R.string.URL_Device_SendCmdDevice))
+                            .post(body)
+                            .build();
+
+                    Response response = okHttpClientModel.INSTANCE.getMOkHttpClient().newCall(request).execute();
+
+                    String result = response.body().string();
+                    Log.e(TAG, result, null);
+                    String getResult = parseObject(result).get("state").toString();
+
+                    if(!getResult.equals("1")){
+                        handler.sendEmptyMessage(SENDCMD_FAIL);
+                        return;
+                    }
+                    handler.sendEmptyMessage(SENDCMD_SUCCESS);
+                } catch(Exception e){
+                    e.printStackTrace();
+                    handler.sendEmptyMessage(SENDCMD_ERROR);
+                }
+            }
+        }).start();
+    }
+
+
     /*****************************  初始化  *************************/
 
     /**
@@ -463,7 +507,7 @@ public class DeviceFrag extends Fragment {
                                         local.getText().toString(),
                                         type.getText().toString(),
                                         "1"
-                                        );
+                                );
                             }
 
 
@@ -579,7 +623,7 @@ public class DeviceFrag extends Fragment {
         listAdapter.setLoadEndView(R.layout.load_end);
 
 
-         //适配器中每一项配置点击事件
+        //适配器中每一项配置点击事件
         listAdapter.setOnItemClickListener(new OnItemClickListener<Map>() {
             @Override
             public void onItemClick(ViewHolder viewHolder, Map map, int i) {
@@ -592,6 +636,13 @@ public class DeviceFrag extends Fragment {
                     intent.putExtra("id", map.get("id").toString());
                     getContext().startActivity(intent);
                 }
+            }
+        });
+
+        listAdapter.setOnItemChildClickListener(R.id.item_device_send, new OnItemChildClickListener<Map>() {
+            @Override
+            public void onItemChildClick(ViewHolder viewHolder, Map map, int i) {
+                sendCmdToThread(((TextView)viewHolder.getView(R.id.item_device_ctrl)).getText().toString(),map.get("id").toString());
             }
         });
 
@@ -697,6 +748,17 @@ public class DeviceFrag extends Fragment {
                         break;
                     case GETLOCAL_FAIL:
                         ToastUtils.showShort("请先打开您的定位");
+                        break;
+                    case SENDCMD_SUCCESS:
+                        ToastUtils.showShort("指令发送成功");
+                        Log.e(TAG, "发送成功", null);
+                        break;
+                    case SENDCMD_FAIL:
+                        ToastUtils.showShort("指令发送失败");
+                        Log.e(TAG, "发送失败", null);
+                        break;
+                    case SENDCMD_ERROR:
+                        Log.e(TAG, "发送错误", null);
                         break;
                 }
                 return false;
