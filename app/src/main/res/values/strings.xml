@@ -79,4 +79,10 @@
     <!-- 重载 -->
     <string name="reload">重新加载</string>
 
+    <!-- 手机号 -->
+    <string name="phone">新手机号</string>
+
+    <!-- Welcome -->
+    <string name="welcome">EasyFarming\n欢迎您</string>
+
 </resources>

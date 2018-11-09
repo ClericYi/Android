@@ -1,20 +1,13 @@
 package com.raspi.easyfarming.device.view;
 
-import android.Manifest;
-import android.content.Context;
+
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.location.Criteria;
-import android.location.Location;
-import android.location.LocationListener;
-import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -29,24 +22,27 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
 import android.widget.ImageView;
-import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.alibaba.fastjson.JSONArray;
-import com.blankj.utilcode.util.LogUtils;
+import com.amap.api.location.AMapLocation;
+import com.amap.api.location.AMapLocationClient;
+import com.amap.api.location.AMapLocationClientOption;
+import com.amap.api.location.AMapLocationListener;
 import com.blankj.utilcode.util.ToastUtils;
 import com.othershe.baseadapter.ViewHolder;
 import com.othershe.baseadapter.interfaces.OnItemChildClickListener;
 import com.othershe.baseadapter.interfaces.OnItemClickListener;
 import com.raspi.easyfarming.R;
 import com.raspi.easyfarming.device.adapter.ListAdapter;
-import com.raspi.easyfarming.utils.LocationUtils;
 import com.raspi.easyfarming.utils.okhttp.okHttpClientModel;
 
 import org.angmarch.views.NiceSpinner;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -59,7 +55,7 @@ import static com.alibaba.fastjson.JSON.parseObject;
 import static com.alibaba.fastjson.JSON.toJSONString;
 
 
-public class DeviceFrag extends Fragment {
+public class DeviceFrag extends Fragment implements AMapLocationListener {
 
     //常量
     private final String TAG = "DeviceFrag";
@@ -101,7 +97,6 @@ public class DeviceFrag extends Fragment {
     private List<String> groups;
     private List<String> groupName;
     private List<String> groupNum;
-    private int getSize = 0 ;
     private boolean isShow = false;
     private String longitude="0";
     private String latitude="0";
@@ -113,6 +108,8 @@ public class DeviceFrag extends Fragment {
 
     //Handler
     private Handler handler;
+
+
 
 
     @Nullable
@@ -162,7 +159,6 @@ public class DeviceFrag extends Fragment {
                     }else {
                         devices.clear();
                         List<Map> result_devices = JSONArray.parseArray(getResult, Map.class);
-                        getSize = result_devices.size();
                         devices.addAll(result_devices);
                         handler.sendEmptyMessage(GETALLDEVICE_SUCCESS);
                     }
@@ -206,7 +202,6 @@ public class DeviceFrag extends Fragment {
                         return;
                     }else {
                         List<Map> result_devices = JSONArray.parseArray(getResult, Map.class);
-                        getSize = result_devices.size();
                         devices.addAll(result_devices);
                         handler.sendEmptyMessage(GETALLDEVICE_SUCCESS);
                     }
@@ -498,9 +493,9 @@ public class DeviceFrag extends Fragment {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
                                 TextView name = view.findViewById(R.id.dialog_adddevice_name);
-                                TextView comment = view.findViewById(R.id.dialog_adddevice_name);
-                                TextView local = view.findViewById(R.id.dialog_adddevice_name);
-                                TextView type = view.findViewById(R.id.dialog_adddevice_name);
+                                TextView comment = view.findViewById(R.id.dialog_adddevice_comment);
+                                TextView local = view.findViewById(R.id.dialog_adddevice_local);
+                                TextView type = view.findViewById(R.id.dialog_adddevice_type);
                                 createDeviceThread(name.getText().toString(),
                                         comment.getText().toString(),
                                         groupNum.get(spinner.getSelectedIndex()),
@@ -634,6 +629,7 @@ public class DeviceFrag extends Fragment {
                 }else{
                     Intent intent = new Intent(getContext(), DetailCenterAcitity.class);
                     intent.putExtra("id", map.get("id").toString());
+                    intent.putExtra("name", map.get("name").toString());
                     getContext().startActivity(intent);
                 }
             }
@@ -677,6 +673,9 @@ public class DeviceFrag extends Fragment {
             public boolean handleMessage(Message message) {
                 switch (message.what){
                     case GETALLDEVICE_SUCCESS:
+                        if(devices.size()%SIZE!=0){
+                            listAdapter.loadEnd();
+                        }
                         PAGE++;
                         listAdapter.notifyDataSetChanged();
                         Log.e(TAG, "获取所有设备成功", null);
@@ -736,6 +735,7 @@ public class DeviceFrag extends Fragment {
                         Log.e(TAG, "获取所有分组失败", null);
                         break;
                     case ADDDEVICE_SUCCESS:
+                        getAllDevicesThread();
                         Toast.makeText(getContext(), "设备添加成功", Toast.LENGTH_SHORT).show();
                         Log.e(TAG, "设备添加成功", null);
                         break;
@@ -747,7 +747,7 @@ public class DeviceFrag extends Fragment {
                         Log.e(TAG, "设备添加失败", null);
                         break;
                     case GETLOCAL_FAIL:
-                        ToastUtils.showShort("请先打开您的定位");
+                        ToastUtils.showShort("定位中或请检查您的定位是否开启");
                         break;
                     case SENDCMD_SUCCESS:
                         ToastUtils.showShort("指令发送成功");
@@ -777,61 +777,53 @@ public class DeviceFrag extends Fragment {
     /**
      *   实现GPS的方法
      */
-
     public void gps() {
-        //定义LocationManager对象
-        LocationManager locationManager = (LocationManager) getContext().getSystemService(Context.LOCATION_SERVICE);
-        //定义Criteria对象
-        Criteria criteria = new Criteria();
-        // 定位的精准度
-        criteria.setAccuracy(Criteria.ACCURACY_FINE);
-        // 海拔信息是否关注
-        criteria.setAltitudeRequired(false);
-        // 对周围的事情是否进行关心
-        criteria.setBearingRequired(false);
-        // 是否支持收费的查询
-        criteria.setCostAllowed(false);
-        // 是否耗电
-        criteria.setPowerRequirement(Criteria.POWER_LOW);
-        // 对速度是否关注
-        criteria.setSpeedRequired(false);
-
-        //得到最好的定位方式
-        String provider = locationManager.getBestProvider(criteria, true);
-
-        //注册监听
-        if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            ToastUtils.showShort("请先打开定位");
-            return;
-        }
-        locationManager.requestLocationUpdates(provider, 100000, 0, new DeviceFrag.MyLocationListener());
+        //AmapGPS
+        AMapLocationClient mlocationClient;
+        AMapLocationClientOption mLocationOption = null;
+        Log.e(TAG, "GPS", null);
+        mlocationClient = new AMapLocationClient(getContext());
+        //初始化定位参数
+        mLocationOption = new AMapLocationClientOption();
+        //设置定位监听
+        mlocationClient.setLocationListener(this);
+        //设置定位模式为高精度模式，Battery_Saving为低功耗模式，Device_Sensors是仅设备模式
+        mLocationOption.setLocationMode(AMapLocationClientOption.AMapLocationMode.Hight_Accuracy);
+        //设置定位间隔,单位毫秒,默认为2000ms
+        mLocationOption.setInterval(2000);
+        //设置定位参数
+        mlocationClient.setLocationOption(mLocationOption);
+        // 此方法为每隔固定时间会发起一次定位请求，为了减少电量消耗或网络流量消耗，
+        // 注意设置合适的定位时间的间隔（最小间隔支持为1000ms），并且在合适时间调用stopLocation()方法来取消定位请求
+        // 在定位结束后，在合适的生命周期调用onDestroy()方法
+        // 在单次定位情况下，定位无论成功与否，都无需调用stopLocation()方法移除请求，定位sdk内部会移除
+        //启动定位
+        mlocationClient.startLocation();
     }
 
-    //实现监听接口
-    private final class MyLocationListener implements LocationListener {
-        @Override// 位置的改变
-        public void onLocationChanged(Location location) {
-            // TODO Auto-generated method stub
-            latitude = String.format("%.2f,",location.getLatitude());// 维度
-            longitude = String.format("%.2f,",location.getLongitude());// 经度
-            LogUtils.e(longitude,latitude);
+    /**
+     * 定位监听事件
+     * @param aMapLocation
+     */
+    @Override
+    public void onLocationChanged(AMapLocation aMapLocation) {
+        if (aMapLocation != null) {
+            if (aMapLocation.getErrorCode() == 0) {
+                //定位成功回调信息，设置相关消息
+                aMapLocation.getLocationType();//获取当前定位结果来源，如网络定位结果，详见定位类型表
+                latitude = String.format("%.2f",aMapLocation.getLatitude());//获取纬度
+                longitude =  String.format("%.2f",aMapLocation.getLongitude());//获取经度
+                aMapLocation.getAccuracy();//获取精度信息
+                SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                Date date = new Date(aMapLocation.getTime());
+                df.format(date);//定位时间
+            } else {
+                //显示错误信息ErrCode是错误码，errInfo是错误信息，详见错误码表。
+                Log.e("AmapError","location Error, ErrCode:"
+                        + aMapLocation.getErrorCode() + ", errInfo:"
+                        + aMapLocation.getErrorInfo());
+            }
         }
-
-        @Override// gps卫星有一个没有找到
-        public void onStatusChanged(String provider, int status, Bundle extras) {
-            // TODO Auto-generated method stub
-        }
-
-        @Override// 某个设置被打开
-        public void onProviderEnabled(String provider) {
-            // TODO Auto-generated method stub
-        }
-
-        @Override// 某个设置被关闭
-        public void onProviderDisabled(String provider) {
-            // TODO Auto-generated method stub
-        }
-
     }
 
 }

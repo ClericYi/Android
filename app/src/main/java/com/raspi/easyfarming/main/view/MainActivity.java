@@ -194,6 +194,7 @@ public class MainActivity extends AppCompatActivity {
      */
     private void initView() {
         getSupportActionBar().hide();
+        getWindow().setStatusBarColor(getResources().getColor(R.color.list_line));
     }
 
     /**
@@ -397,8 +398,8 @@ public class MainActivity extends AppCompatActivity {
                 .setContentTitle("警报")
                 .setContentText("温度已经超出警告值")
                 .setWhen(System.currentTimeMillis())
-                .setSmallIcon(R.mipmap.ic_launcher)
-                .setLargeIcon(BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher))
+                .setSmallIcon(R.drawable.ic_logo)
+                .setLargeIcon(BitmapFactory.decodeResource(getResources(), R.drawable.ic_logo))
                 .setContentIntent(pi)
                 .build();
         NotificationManager manager = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);

@@ -430,9 +430,12 @@ public class SpotFrag extends Fragment {
                 switch (msg.what){
                     case GET_SUCCESS:
                         //初始化
+                        if(listMap.size()%Size!=0){
+                            spotAdapter.loadEnd();
+                        }
                         Log.e("Spot", "Success", null);
-                        initSDK(getContext(), RECENVETOPICFORMAT);
-                        connectServer();
+//                        initSDK(getContext(), RECENVETOPICFORMAT);
+//                        connectServer();
                         PAGE++;
                         spotAdapter.notifyDataSetChanged();
                         break;

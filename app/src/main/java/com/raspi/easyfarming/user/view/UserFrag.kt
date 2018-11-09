@@ -1,12 +1,11 @@
 package com.raspi.easyfarming.user.view
 
-import android.app.Activity
+import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import android.support.v4.app.Fragment
-import android.support.v4.content.ContextCompat.startActivity
 import android.support.v7.widget.DefaultItemAnimator
 import android.support.v7.widget.DividerItemDecoration
 import android.support.v7.widget.LinearLayoutManager
@@ -16,6 +15,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import com.alibaba.fastjson.JSON.parseObject
+import com.othershe.baseadapter.interfaces.OnItemClickListener
 import com.raspi.easyfarming.R
 import com.raspi.easyfarming.login.view.LoginActivity
 import com.raspi.easyfarming.main.view.MainActivity
@@ -33,8 +33,8 @@ class UserFrag : Fragment() {
     private val QUIT_SUCCESS = 1
     private val QUIT_FAIL = 2
     private val QUIT_ERROR = 3
-    private val icons = arrayListOf<Int>(R.drawable.ic_user_info, R.drawable.ic_user_texts, R.drawable.ic_user_triggers, R.drawable.ic_user_netconfig)
-    private val texts = arrayListOf<Int>(R.string.personinfo, R.string.user_logs, R.string.trigger, R.string.netconfig)
+    private val icons = arrayListOf<Int>(R.drawable.ic_phone, R.drawable.ic_user_texts, R.drawable.ic_user_triggers, R.drawable.ic_user_netconfig)
+    private val texts = arrayListOf<Int>(R.string.user_changephone, R.string.user_logs, R.string.trigger, R.string.netconfig)
 
     //适配器
     private var userListAdapter: ListAdapter? = null
@@ -87,7 +87,7 @@ class UserFrag : Fragment() {
                 handler.sendEmptyMessage(QUIT_ERROR)
             }
         }
-        }).start()
+    }).start()
 
     /**
      * 初始化点击事件
@@ -100,14 +100,36 @@ class UserFrag : Fragment() {
      * 初始化功能列表
      */
     private fun initUserList() {
-        val listMaps = ArrayList<Map<String, Any>>()
+        val listMaps = ArrayList<Map<String, Int>>()
         for (i in texts.indices) {
-            val map = HashMap<String, Any>()
+            val map = HashMap<String, Int>()
             map["text"] = texts[i]
             map["icon"] = icons[i]
             listMaps.add(map)
         }
-        userListAdapter = ListAdapter(listMaps, context)
+        userListAdapter = ListAdapter(context, listMaps,true)
+        userListAdapter?.setOnItemClickListener(OnItemClickListener { viewHolder, t, i ->
+            when(i) {
+                0 -> {
+                    AlertDialog.Builder(context)
+                            .setTitle("修改手机号")
+                            .create()
+                            .show()
+                }
+                1 -> {
+                    val intent = Intent(context, LogsActivity::class.java)
+                    context?.startActivity(intent)
+                }
+                2 -> {
+                    val intent = Intent(context, TriggersActivity::class.java)
+                    context?.startActivity(intent)
+                }
+                3 -> {
+                    val intent = Intent(context, WifiConnectActivity::class.java)
+                    context?.startActivity(intent)
+                }
+                else -> {}
+            } })
         frag_user_rv.adapter = userListAdapter
         frag_user_rv.layoutManager = LinearLayoutManager(context)
         frag_user_rv.setHasFixedSize(true)
@@ -118,15 +140,15 @@ class UserFrag : Fragment() {
     /**
      * 初始化Handler
      */
-      private val handler = Handler(Handler.Callback { msg ->
-            when (msg.what) {
-                QUIT_SUCCESS -> {
-                    val intent = Intent(context, LoginActivity::class.java)
-                    startActivity(intent)
-                }
-                QUIT_FAIL -> Toast.makeText(context, "注销失败，请稍后再试", Toast.LENGTH_SHORT).show()
-                QUIT_ERROR -> Toast.makeText(context, "注销异常，请稍后再试", Toast.LENGTH_SHORT).show()
+    private val handler = Handler(Handler.Callback { msg ->
+        when (msg.what) {
+            QUIT_SUCCESS -> {
+                val intent = Intent(context, LoginActivity::class.java)
+                startActivity(intent)
             }
-            false
-        })
+            QUIT_FAIL -> Toast.makeText(context, "注销失败，请稍后再试", Toast.LENGTH_SHORT).show()
+            QUIT_ERROR -> Toast.makeText(context, "注销异常，请稍后再试", Toast.LENGTH_SHORT).show()
+        }
+        false
+    })
 }

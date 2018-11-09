@@ -11,25 +11,28 @@ class DetailCenterAcitity: AppCompatActivity(){
 
     //数据
     var id:String ?= "0"
+    var name:String ?="Device"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_detail_center)
+        initObject()//初始化数据
         initView()//初始化控件
         initTab()//初始化TabHost
-        initObject()//初始化数据
     }
 
     private fun initObject() {
         id = intent?.getStringExtra("id")
+        name = intent?.getStringExtra("name")
     }
 
     /**
      * 初始化控件
      */
     private fun initView() {
-        supportActionBar?.title = "Device"
+        supportActionBar?.title = name
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        window.statusBarColor = resources.getColor(R.color.bnv_color)
     }
 
     /**

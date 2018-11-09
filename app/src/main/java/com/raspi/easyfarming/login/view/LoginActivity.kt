@@ -139,6 +139,8 @@ class LoginActivity : AppCompatActivity() {
      */
     private fun initView() {
         supportActionBar?.hide()
+
+        window.statusBarColor = resources.getColor(R.color.gray_font_3)
     }
 
     /**

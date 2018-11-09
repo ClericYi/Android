@@ -10,6 +10,10 @@
 
     <color name="online_false">#F25E43</color>
     <color name="online_true">#64D672</color>
+    <!-- bnvx    -->
+    <color name="bnv_color">#FADD68</color>
+    <color name="bnv_false_color">#B6A76C</color>
+    <color name="bnv_true_color">#443F1F</color>
 
     <!-- smartconfig -->
     <color name="app_main_color">#333333</color>
@@ -17,5 +21,6 @@
     <color name="tabUnSelected">#999999</color>
     <color name="white_2">#fefefe</color>
     <color name="iron">#CCCCCC</color>
+
 
 </resources>

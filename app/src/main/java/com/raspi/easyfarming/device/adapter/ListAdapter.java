@@ -59,7 +59,7 @@ public class ListAdapter extends CommonBaseAdapter<Map> {
                         .setImageDrawable((boolean)map.get("isOnline")?
                                 mContext.getDrawable(R.drawable.ic_spot_true):mContext.getDrawable(R.drawable.ic_spot_false));
                 break;
-            case "DEVICE":
+            default:
                 ((ImageView)viewHolder.getView(R.id.item_device_img))
                         .setImageDrawable((boolean)map.get("isOnline")?
                                 mContext.getDrawable(R.drawable.ic_device_self_true):mContext.getDrawable(R.drawable.ic_device_self_false));
