@@ -28,6 +28,7 @@ import android.widget.Toast;
 
 import com.raspi.easyfarming.R;
 import com.raspi.easyfarming.device.view.DeviceCenterFrag;
+import com.raspi.easyfarming.spot.view.SpotCenterFrag;
 import com.raspi.easyfarming.spot.view.SpotFrag;
 import com.raspi.easyfarming.user.view.UserFrag;
 import com.raspi.easyfarming.utils.network.NetBroadcastReceiver;
@@ -142,7 +143,7 @@ public class MainActivity extends AppCompatActivity {
 
         DeviceCenterFrag deviceCenterFrag = new DeviceCenterFrag();
         UserFrag userFrag = new UserFrag();
-        SpotFrag spotCenterFrag = new SpotFrag();
+        SpotCenterFrag spotCenterFrag = new SpotCenterFrag();
         //添加fragment
         fragments = new ArrayList<Fragment>();
         fragments.add(deviceCenterFrag);

@@ -21,7 +21,7 @@
     <application
         android:name=".utils.base.MyApplication"
         android:allowBackup="true"
-        android:icon="@drawable/ic_logo"
+        android:icon="@drawable/ic_logo_back"
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
@@ -79,6 +79,9 @@
 
         </activity>
 
+        <activity android:name=".spot.view.MapFrag">
+
+        </activity>
 
         <!-- Mqtt Service -->
         <service android:name="org.eclipse.paho.android.service.MqttService"/>

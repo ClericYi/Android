@@ -84,14 +84,22 @@ public class DetailFrag extends Fragment {
     private DetailListAdapter deviceDetailListAdapter;
     private DetailOtherListAdapter deviceDetailOtherListAdapter;
 
+    //View
+    private View view;
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.from(getContext()).inflate(R.layout.frag_device_detail, container, false);
+        if(view == null) {
+            view = inflater.from(getContext()).inflate(R.layout.frag_device_detail, null);
+        }
+        ViewGroup parent = (ViewGroup) view.getParent();
+        if (parent != null) {
+            parent.removeView(view);
+        }
         initView(view);//初始化控件
         initHandler();//初始化Handler
         initList();//初始化列表
-        initThread();//初始化线程
         return view;
     }
 
@@ -124,6 +132,8 @@ public class DetailFrag extends Fragment {
                         return;
                     } else {
                         //处理数据
+                        baseListMaps.clear();
+                        moreListMaps.clear();
                         baseResultDeal(map);
                         moreResultDeal(map);
                         handler.sendEmptyMessage(DEVICE_SUCCESS);
@@ -262,5 +272,12 @@ public class DetailFrag extends Fragment {
                 return false;
             }
         });
+    }
+
+    /******************************** 生命周期 **********************************/
+    @Override
+    public void onResume() {
+        super.onResume();
+        initThread();//初始化线程
     }
 }

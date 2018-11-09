@@ -3,6 +3,7 @@ package com.raspi.easyfarming.device.view
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.view.MenuItem
+import android.widget.TabHost
 
 import com.raspi.easyfarming.R
 import kotlinx.android.synthetic.main.activity_detail_center.*

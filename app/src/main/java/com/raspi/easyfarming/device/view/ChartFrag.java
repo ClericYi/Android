@@ -48,10 +48,19 @@ public class ChartFrag extends Fragment {
     private List<String> datas;
     EchartsLineBean echartsLineBean;
 
+    //View
+    private View view;
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.from(getContext()).inflate(R.layout.frag_chart, container, false);
+        if(view == null) {
+            view = inflater.from(getContext()).inflate(R.layout.frag_chart, null);
+        }
+        ViewGroup parent = (ViewGroup) view.getParent();
+        if (parent != null) {
+            parent.removeView(view);
+        }
         initView(view);
         initThread();
         return view;

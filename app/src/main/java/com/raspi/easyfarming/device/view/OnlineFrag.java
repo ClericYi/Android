@@ -47,10 +47,19 @@ public class OnlineFrag extends Fragment {
     //动画
     private ScaleAnimation anim;
 
+    //View
+    private View view;
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.from(getContext()).inflate(R.layout.frag_device_online, container, false);
+        if(view == null) {
+            view = inflater.from(getContext()).inflate(R.layout.frag_device_online, null);
+        }
+        ViewGroup parent = (ViewGroup) view.getParent();
+        if (parent != null) {
+            parent.removeView(view);
+        }
         initView(view);//控件初始化
         initAnim();//动画初始化
         return view;

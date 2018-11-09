@@ -80,14 +80,22 @@ public class SpotFrag extends Fragment {
     private boolean connectSuccess;
     private String[] point;
 
+    //View
+    private View view;
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View  view = inflater.from(getContext()).inflate(R.layout.frag_spot_list, container, false);
+        if(view == null) {
+            view = inflater.from(getContext()).inflate(R.layout.frag_spot_list, null);
+        }
+        ViewGroup parent = (ViewGroup) view.getParent();
+        if (parent != null) {
+            parent.removeView(view);
+        }
         initView(view);//初始化控件
         initHandler();//初始化Handler
         initList();//初始化列表
-        initThread();//初始化线程
         initRv();//实现下拉加载
         return view;
     }
@@ -482,5 +490,11 @@ public class SpotFrag extends Fragment {
     public void onDestroy() {
         close();
         super.onDestroy();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        initThread();//初始化线程
     }
 }

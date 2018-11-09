@@ -109,14 +109,20 @@ public class DeviceFrag extends Fragment implements AMapLocationListener {
     //Handler
     private Handler handler;
 
-
-
+    //View
+    private View view;
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.from(getContext()).inflate(R.layout.frag_device_list, container, false);
-        gps();
+        if(view == null) {
+            view = inflater.from(getContext()).inflate(R.layout.frag_device_list, null);
+        }
+        ViewGroup parent = (ViewGroup) view.getParent();
+        if (parent != null) {
+            parent.removeView(view);
+        }
+        initGPS();
         initView(view);//初始化控件
         initList();//初始化列表
         initHandler();//初始化Handler
@@ -777,7 +783,7 @@ public class DeviceFrag extends Fragment implements AMapLocationListener {
     /**
      *   实现GPS的方法
      */
-    public void gps() {
+    public void initGPS() {
         //AmapGPS
         AMapLocationClient mlocationClient;
         AMapLocationClientOption mLocationOption = null;
