@@ -22,6 +22,7 @@ import com.raspi.easyfarming.main.view.MainActivity
 import com.raspi.easyfarming.user.adapter.ListAdapter
 import com.raspi.easyfarming.utils.okhttp.okHttpClientModel
 import kotlinx.android.synthetic.main.frag_user.*
+import kotlinx.android.synthetic.main.item_user.view.*
 import okhttp3.Request
 import java.util.ArrayList
 import java.util.HashMap
@@ -30,17 +31,16 @@ class UserFrag : Fragment() {
 
     //常量
     private val TAG = "UserFrag"
-    private val QUIT_SUCCESS = 1
-    private val QUIT_FAIL = 2
-    private val QUIT_ERROR = 3
-    private val icons = arrayListOf<Int>(R.drawable.ic_phone, R.drawable.ic_user_texts, R.drawable.ic_user_triggers, R.drawable.ic_user_netconfig)
-    private val texts = arrayListOf<Int>(R.string.user_changephone, R.string.user_logs, R.string.trigger, R.string.netconfig)
+    private val icons = arrayListOf<Int>(R.drawable.ic_user_texts, R.drawable.ic_user_triggers, R.drawable.ic_user_netconfig)
+    private val texts = arrayListOf<Int>(R.string.user_logs, R.string.trigger, R.string.netconfig)
 
     //适配器
     private var userListAdapter: ListAdapter? = null
 
     //数据
     private var username_text: String? = null
+    private var phone:String ?= null
+    private var email:String ?= null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.frag_user, container, false)
@@ -48,53 +48,33 @@ class UserFrag : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        initOnClick()//初始化点击事件
         initUserList()//初始化功能列表
-        frag_user_username.text = username_text
+        intUser()
+        initClick()
+    }
+
+    private fun initClick() {
+        frag_user.setOnClickListener(View.OnClickListener {
+            val intent = Intent()
+            intent.setClass(context, ManagerActivity::class.java)
+            intent.putExtra("email", email)
+            intent.putExtra("phone", phone)
+            context?.startActivity(intent)
+        })
+    }
+
+    private fun intUser() {
+        frag_user.item_user_ic.background = context?.resources?.getDrawable(R.drawable.ic_user_head)
+        frag_user.item_user_tv.text = "用户管理"
     }
 
     override fun onAttach(context: Context?) {
         super.onAttach(context)
         username_text = (context as MainActivity).username
+        email = (context as MainActivity).email
+        phone = (context as MainActivity).phone
     }
 
-    /**
-     * 注销线程
-     */
-    private fun loginOutThread() = Thread(Runnable {
-        kotlin.run {
-            try {
-                val url = context!!.resources.getString(R.string.URL_LoginOut)
-
-                val request = Request.Builder()
-                        .url(url)
-                        .build()
-
-                val response = okHttpClientModel.mOkHttpClient?.newCall(request)?.execute()
-
-                val result = response?.body()?.string()
-                Log.e(TAG, result, null)
-
-                val message = parseObject(result).get("state")!!.toString()
-                if (message.equals("1")) {
-                    handler.sendEmptyMessage(QUIT_SUCCESS)
-                } else {
-                    handler.sendEmptyMessage(QUIT_FAIL)
-                    return@Runnable
-                }
-            } catch (e: Exception) {
-                e.printStackTrace()
-                handler.sendEmptyMessage(QUIT_ERROR)
-            }
-        }
-    }).start()
-
-    /**
-     * 初始化点击事件
-     */
-    private fun initOnClick() {
-        frag_user_quit.setOnClickListener(View.OnClickListener { loginOutThread() })
-    }
 
     /**
      * 初始化功能列表
@@ -111,20 +91,14 @@ class UserFrag : Fragment() {
         userListAdapter?.setOnItemClickListener(OnItemClickListener { viewHolder, t, i ->
             when(i) {
                 0 -> {
-                    AlertDialog.Builder(context)
-                            .setTitle("修改手机号")
-                            .create()
-                            .show()
-                }
-                1 -> {
                     val intent = Intent(context, LogsActivity::class.java)
                     context?.startActivity(intent)
                 }
-                2 -> {
+                1 -> {
                     val intent = Intent(context, TriggersActivity::class.java)
                     context?.startActivity(intent)
                 }
-                3 -> {
+                2 -> {
                     val intent = Intent(context, WifiConnectActivity::class.java)
                     context?.startActivity(intent)
                 }
@@ -142,12 +116,7 @@ class UserFrag : Fragment() {
      */
     private val handler = Handler(Handler.Callback { msg ->
         when (msg.what) {
-            QUIT_SUCCESS -> {
-                val intent = Intent(context, LoginActivity::class.java)
-                startActivity(intent)
-            }
-            QUIT_FAIL -> Toast.makeText(context, "注销失败，请稍后再试", Toast.LENGTH_SHORT).show()
-            QUIT_ERROR -> Toast.makeText(context, "注销异常，请稍后再试", Toast.LENGTH_SHORT).show()
+
         }
         false
     })

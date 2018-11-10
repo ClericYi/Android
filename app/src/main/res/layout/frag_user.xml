@@ -10,56 +10,34 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
-            <android.support.constraint.ConstraintLayout
-                android:id="@+id/frag_user_cons"
+            <TextView
+                android:id="@+id/user_text"
                 android:layout_width="match_parent"
-                android:layout_height="100dp"
-                android:background="@color/login_button_active">
-
-                <ImageView
-                    android:id="@+id/frag_user_img"
-                    android:layout_width="60dp"
-                    android:layout_height="60dp"
-                    android:src="@drawable/ic_user_head"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    android:layout_marginStart="20dp"
-                    />
+                android:layout_height="50dp"
+                android:text="@string/title_user"
+                android:gravity="center"
+                android:typeface="serif"
+                android:textSize="26sp"
+                android:background="@color/online_true"
+                />
 
 
-                <TextView
-                    android:id="@+id/frag_user_username"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textSize="18sp"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintStart_toEndOf="@id/frag_user_img"
-                    android:layout_marginStart="20dp"
-                    android:text="TextView"
-                    android:textColor="@color/white"/>
-
-                <Button
-                    android:id="@+id/frag_user_quit"
-                    android:layout_width="wrap_content"
-                    android:layout_height="40dp"
-                    android:background="@drawable/bg_white_border"
-                    android:text="@string/loginout"
-                    android:textColor="@color/white"
-                    android:textSize="18sp"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    android:layout_marginEnd="40dp"
-                    />
-            </android.support.constraint.ConstraintLayout>
 
             <android.support.v7.widget.RecyclerView
                 android:id="@+id/frag_user_rv"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:layout_constraintTop_toBottomOf="@id/frag_user_cons"
+                app:layout_constraintTop_toBottomOf="@id/user_text"
+                android:layout_marginTop="20dp"
+                />
+
+            <include
+                android:id="@+id/frag_user"
+                layout="@layout/item_user"
+                android:layout_width="match_parent"
+                android:layout_height="55dp"
+                app:layout_constraintTop_toBottomOf="@id/frag_user_rv"
+                android:layout_marginTop="20dp"
                 />
 
         </android.support.constraint.ConstraintLayout>

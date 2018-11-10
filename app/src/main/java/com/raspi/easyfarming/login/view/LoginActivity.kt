@@ -10,6 +10,7 @@ import android.os.Message
 import android.support.v7.app.AppCompatActivity
 import android.text.Editable
 import android.util.Log
+import android.view.KeyEvent
 import android.view.View
 import android.widget.Toast
 import com.alibaba.fastjson.JSON.parseObject
@@ -41,6 +42,10 @@ class LoginActivity : AppCompatActivity() {
 
     //sharePreference
     private var spUtil:SharePreferenceUtil?=null
+
+    //数据
+    private var email: String? = null
+    private var phone: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -94,6 +99,9 @@ class LoginActivity : AppCompatActivity() {
 
 
                 if (loginResult.equals("1")){
+                    val data =  parseObject(parseObject(result).get("data").toString())
+                    email = data.get("email").toString()
+                    phone = data.get("phone").toString()
                     handler.sendEmptyMessage(LOGIN_SUCCESS)
                 }else{
                     handler.sendEmptyMessage(LOGIN_FAIL)
@@ -140,7 +148,6 @@ class LoginActivity : AppCompatActivity() {
     private fun initView() {
         supportActionBar?.hide()
 
-        window.statusBarColor = resources.getColor(R.color.gray_font_3)
     }
 
     /**
@@ -163,6 +170,8 @@ class LoginActivity : AppCompatActivity() {
                     val intent = Intent()
                     intent.setClass(self, MainActivity::class.java)
                     intent.putExtra("username",login_username.text.toString())
+                    intent.putExtra("email", email)
+                    intent.putExtra("phone", phone)
                     startActivity(intent)
                     finish()
                 }
@@ -211,5 +220,14 @@ class LoginActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         initNetBoardcastReceiver()
+    }
+
+    /*********************** 物理键重写  */
+    override fun onKeyDown(keyCode: Int, event: KeyEvent): Boolean {
+        if (keyCode == KeyEvent.KEYCODE_BACK) {
+            moveTaskToBack(true)
+            return false
+        }
+        return super.onKeyDown(keyCode, event)
     }
 }

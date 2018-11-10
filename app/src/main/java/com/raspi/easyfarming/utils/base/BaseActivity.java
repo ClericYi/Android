@@ -1,4 +1,4 @@
-package com.raspi.easyfarming.user.view;
+package com.raspi.easyfarming.utils.base;
 
 import android.os.Build;
 import android.os.Bundle;

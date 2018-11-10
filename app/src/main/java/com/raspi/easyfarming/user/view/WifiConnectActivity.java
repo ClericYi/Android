@@ -18,6 +18,7 @@ import android.widget.Toast;
 
 import com.raspi.easyfarming.R;
 import com.raspi.easyfarming.user.adapter.WifiListAdapter;
+import com.raspi.easyfarming.utils.base.BaseActivity;
 import com.tbruyelle.rxpermissions.RxPermissions;
 
 import java.util.ArrayList;

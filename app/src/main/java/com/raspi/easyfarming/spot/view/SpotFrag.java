@@ -82,6 +82,7 @@ public class SpotFrag extends Fragment {
 
     //View
     private View view;
+    private int flag = 0;
 
     @Nullable
     @Override
@@ -93,13 +94,22 @@ public class SpotFrag extends Fragment {
         if (parent != null) {
             parent.removeView(view);
         }
+        if(flag == 0){
+            initEach();//初始化所有
+        }
+        return view;
+    }
+
+    /**
+     * 初始化所有
+     */
+    private void initEach() {
         initView(view);//初始化控件
         initHandler();//初始化Handler
         initList();//初始化列表
         initRv();//实现下拉加载
-        return view;
+        flag =1;
     }
-
 
 
     /******************************************  MQTT数据处理*********************************************************/
@@ -309,6 +319,7 @@ public class SpotFrag extends Fragment {
                         for(int i = 0; i<size; i++){
                             RECENVETOPICFORMAT[i] = list.get(i).get("topic").toString();
                         }
+                        listMap.clear();
                         listMap.addAll(list);
                         handler.sendEmptyMessage(GET_SUCCESS);
                     }

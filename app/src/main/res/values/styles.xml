@@ -16,9 +16,9 @@
 
     <style name="CheckBoxTheme">
         <!--波纹的颜色-->
-        <item name="android:colorControlHighlight">@color/login_button_active</item>
+        <item name="android:colorControlHighlight">@color/bnv_color</item>
         <!--选中的颜色-->
-        <item name="colorAccent">@color/login_button_active</item>
+        <item name="colorAccent">@color/bnv_color</item>
     </style>
 
     <style name="TabHostTheme"  parent="Theme.AppCompat.Light.DarkActionBar">

@@ -22,6 +22,8 @@
     <string name="URL_Video_Start">http://39.108.153.134/api/api/v1/sendCmdToDevice</string>
     <string name="URL_Device_SendCmdDevice">http://39.108.153.134/api/api/v1/sendCmdToDevice</string>
     <string name="URL_User_GetAllDeviceLocationByUser">http://39.108.153.134/api/device/getAllDeviceLocationByUser</string>
+    <string name="URL_User_UpdateUser">http://39.108.153.134/api/user/updateUser</string>
+    <string name="URL_User_ChangePassword">http://39.108.153.134/api/user/changePassword</string>
 
     <!-- 登录 -->
     <string name="login_next">登录</string>
@@ -54,12 +56,14 @@
     <string name="setting_tv_3">请输入Wifi密码</string>
 
     <!-- 用户中心列表 -->
-    <string name="user_changephone">修改手机号码</string>
+    <string name="user_phone">修改手机号码</string>
+    <string name="user_password">密码修改</string>
     <string name="user_logs">日志信息</string>
     <string name="loginout">注销</string>
     <string name="personinfo">个人中心</string>
     <string name="trigger">触发器</string>
     <string name="netconfig">网络一键配置</string>
+    <string name="user_manager">用户管理</string>
 
     <!-- channel -->
     <string name="channel_group_name">优品派</string>
@@ -86,4 +90,17 @@
     <!-- Welcome -->
     <string name="welcome">EasyFarming\n欢迎您</string>
 
+    <!--  标题栏 -->
+    <string name="title_device">我的设备</string>
+    <string name="title_spot">设备监控</string>
+    <string name="title_user">用户中心</string>
+
+    <!-- button -->
+    <string name="ok">确定</string>
+
+    <!-- 手机 -->
+    <string name="change_email">邮箱号:</string>
+    <string name="change_phone">手机号:</string>
+    <string name="password">新密码:</string>
+    <string name="retry_password">再次输入:</string>
 </resources>

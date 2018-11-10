@@ -26,7 +26,7 @@ public class ListAdapter extends CommonBaseAdapter<Map> {
     @Override
     protected void convert(ViewHolder viewHolder, Map map, int i) {
         viewHolder.setText(R.id.item_device_name, map.get("name").toString());
-        viewHolder.setText(R.id.item_device_description, map.get("lastActiveDate").toString());
+        viewHolder.setText(R.id.item_device_description, map.get("describe").toString());
         viewHolder.getView(R.id.item_device_rb).setVisibility(isShow?View.VISIBLE:View.GONE);
         switch (CheckNull(map.get("deviceType"))) {
             case "TEMP":

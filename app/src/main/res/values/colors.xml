@@ -8,8 +8,8 @@
 
     <color name="login_button_active">#00D1B2</color>
 
-    <color name="online_false">#F25E43</color>
-    <color name="online_true">#64D672</color>
+    <color name="online_false">#999999</color>
+    <color name="online_true">#FADD68</color>
     <!-- bnvx    -->
     <color name="bnv_color">#FADD68</color>
     <color name="bnv_false_color">#B6A76C</color>

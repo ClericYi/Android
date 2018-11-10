@@ -67,10 +67,20 @@ public class MainActivity extends AppCompatActivity {
 
     //数据
     private List<Fragment> fragments;
-    String username;
+    private String username;
+    private String phone;
+    private String email;
 
     public String getUsername() {
         return username;
+    }
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public String getEmail() {
+        return email;
     }
 
     //mqtt
@@ -102,6 +112,12 @@ public class MainActivity extends AppCompatActivity {
         Intent intent = getIntent();
         if(intent!=null&&intent.hasExtra("username")){
             username  = intent.getStringExtra("username");
+        }
+        if(intent!=null&&intent.hasExtra("email")){
+            email  = intent.getStringExtra("email");
+        }
+        if(intent!=null&&intent.hasExtra("phone")){
+            phone  = intent.getStringExtra("phone");
         }
     }
 
@@ -195,7 +211,7 @@ public class MainActivity extends AppCompatActivity {
      */
     private void initView() {
         getSupportActionBar().hide();
-        getWindow().setStatusBarColor(getResources().getColor(R.color.list_line));
+        getWindow().setStatusBarColor(getResources().getColor(R.color.online_true));
     }
 
     /**

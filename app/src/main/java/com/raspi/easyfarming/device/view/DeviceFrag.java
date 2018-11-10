@@ -111,6 +111,7 @@ public class DeviceFrag extends Fragment implements AMapLocationListener {
 
     //View
     private View view;
+    private int flag = 0;
 
     @Nullable
     @Override
@@ -122,13 +123,23 @@ public class DeviceFrag extends Fragment implements AMapLocationListener {
         if (parent != null) {
             parent.removeView(view);
         }
+        if(flag == 0){
+            initEach();//初始化所有
+        }
+        return view;
+    }
+
+    /**
+     * 初始化所有
+     */
+    private void initEach(){
         initGPS();
         initView(view);//初始化控件
         initList();//初始化列表
         initHandler();//初始化Handler
         initOnClick();//初始化点击事件
         initRv();//为RecycleView增加下拉加载;
-        return view;
+        flag = 1;
     }
 
 
@@ -779,6 +790,8 @@ public class DeviceFrag extends Fragment implements AMapLocationListener {
         initThread();//初始化线程
     }
 
+
+
     /************************************ 定位******************************************/
     /**
      *   实现GPS的方法
@@ -796,7 +809,7 @@ public class DeviceFrag extends Fragment implements AMapLocationListener {
         //设置定位模式为高精度模式，Battery_Saving为低功耗模式，Device_Sensors是仅设备模式
         mLocationOption.setLocationMode(AMapLocationClientOption.AMapLocationMode.Hight_Accuracy);
         //设置定位间隔,单位毫秒,默认为2000ms
-        mLocationOption.setInterval(2000);
+        mLocationOption.setInterval(10000);
         //设置定位参数
         mlocationClient.setLocationOption(mLocationOption);
         // 此方法为每隔固定时间会发起一次定位请求，为了减少电量消耗或网络流量消耗，

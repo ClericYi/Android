@@ -86,6 +86,7 @@ public class DetailFrag extends Fragment {
 
     //View
     private View view;
+    private int flag = 0;
 
     @Nullable
     @Override
@@ -97,13 +98,21 @@ public class DetailFrag extends Fragment {
         if (parent != null) {
             parent.removeView(view);
         }
-        initView(view);//初始化控件
-        initHandler();//初始化Handler
-        initList();//初始化列表
+        if(flag == 0){
+            initEach();//初始化所有
+        }
         return view;
     }
 
-
+    /**
+     * 初始化所有
+     */
+    private void initEach(){
+        initView(view);//初始化控件
+        initHandler();//初始化Handler
+        initList();//初始化列表
+        flag = 1;
+    }
 
 
     /******************************************* 线程处理 *********************************************/

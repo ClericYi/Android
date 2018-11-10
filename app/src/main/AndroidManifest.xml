@@ -21,7 +21,7 @@
     <application
         android:name=".utils.base.MyApplication"
         android:allowBackup="true"
-        android:icon="@drawable/ic_logo_back"
+        android:icon="@drawable/ic_logo"
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
@@ -50,10 +50,12 @@
         <activity android:name=".user.view.LogsActivity"
             android:label="@string/user_logs"
             android:screenOrientation="portrait"
+            android:theme="@style/TabHostTheme"
             />
         <activity android:name=".user.view.TriggersActivity"
             android:label="@string/trigger"
             android:screenOrientation="portrait"
+            android:theme="@style/TabHostTheme"
             />
         <activity android:name=".device.view.DetailCenterAcitity"
             android:theme="@style/TabHostTheme"
@@ -79,10 +81,18 @@
 
         </activity>
 
-        <activity android:name=".spot.view.MapFrag">
+        <activity android:name=".user.view.ManagerActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/TabHostTheme"/>
 
-        </activity>
+        <activity android:name=".user.view.PhoneActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/TabHostTheme"/>
 
+
+        <activity android:name=".user.view.PasswordActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/TabHostTheme"/>
         <!-- Mqtt Service -->
         <service android:name="org.eclipse.paho.android.service.MqttService"/>
         <!-- GPS -->

@@ -49,6 +49,7 @@ public class OnlineFrag extends Fragment {
 
     //View
     private View view;
+    private int flag = 0;
 
     @Nullable
     @Override
@@ -60,12 +61,20 @@ public class OnlineFrag extends Fragment {
         if (parent != null) {
             parent.removeView(view);
         }
-        initView(view);//控件初始化
-        initAnim();//动画初始化
+        if(flag == 0) {
+            initEach();//初始化所有
+        }
         return view;
     }
 
-
+    /**
+     * 初始化所有
+     */
+    private void initEach() {
+        initView(view);
+        initAnim();
+        flag = 1;
+    }
 
 
     /****************************  线程  ************************************/
@@ -109,7 +118,7 @@ public class OnlineFrag extends Fragment {
      * 动画初始化
      */
     private void initAnim() {
-        anim = new ScaleAnimation(0.0f, 1.1f, 0.0f, 1.1f,
+        anim = new ScaleAnimation(0.0f, 1.0f, 0.0f, 1.0f,
                 Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
         anim.setDuration(1000);
         AnimationUtils.loadAnimation(getContext(),R.anim.online_scale);

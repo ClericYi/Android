@@ -53,6 +53,7 @@ public class MapFrag extends Fragment {
 
     //View
     private View view;
+    private int flag = 0;
 
     @Nullable
     @Override
@@ -64,10 +65,20 @@ public class MapFrag extends Fragment {
         if (parent != null) {
             parent.removeView(view);
         }
+        if(flag == 0){
+            initEach(savedInstanceState);
+        }
+        return view;
+    }
+
+    /**
+     * 初始化所有
+     */
+    private void initEach(@Nullable Bundle savedInstanceState) {
         initView(view);
         initHandler();
         initMap(savedInstanceState);//初始化地图
-        return view;
+        flag = 1;
     }
 
 

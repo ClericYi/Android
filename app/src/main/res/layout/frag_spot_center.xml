@@ -4,18 +4,32 @@
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
+    <TextView
+        android:id="@+id/spot_text"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:text="@string/title_spot"
+        android:gravity="center"
+        android:typeface="serif"
+        android:textSize="26sp"
+        android:background="@color/online_true"
+        />
+
     <android.support.v4.app.FragmentTabHost
         android:id="@+id/spot_tabhost"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        app:theme="@style/TabHostTheme"/>
+        android:layout_height="0dp"
+        app:layout_constraintTop_toBottomOf="@+id/spot_text"
+        app:layout_constraintBottom_toBottomOf="parent"/>
     <!--存放主要页面内容-->
     <FrameLayout
         android:id="@+id/spot_maincontent"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-
+        android:layout_height="0dp"
+        app:layout_constraintTop_toBottomOf="@+id/spot_text"
+        app:layout_constraintBottom_toBottomOf="parent"
         >
     </FrameLayout>
+
 
 </android.support.constraint.ConstraintLayout>

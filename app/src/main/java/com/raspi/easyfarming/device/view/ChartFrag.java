@@ -50,6 +50,7 @@ public class ChartFrag extends Fragment {
 
     //View
     private View view;
+    private int flag = 0;
 
     @Nullable
     @Override
@@ -61,9 +62,18 @@ public class ChartFrag extends Fragment {
         if (parent != null) {
             parent.removeView(view);
         }
-        initView(view);
-        initThread();
+        if(flag == 0){
+            initEach();//初始化所有
+        }
         return view;
+    }
+
+    /**
+     * 初始化所有
+     */
+    private void initEach() {
+        initView(view);
+        flag = 1;
     }
 
     /************************************** 线程  ***************************************/
@@ -120,7 +130,8 @@ public class ChartFrag extends Fragment {
      * 初始化webView
      */
     @SuppressLint("SetJavaScriptEnabled")
-    private void initWebView(){
+    private void
+    initWebView(){
         //进行webwiev的一堆设置
         webView.getSettings().setAllowFileAccess(true);
         webView.getSettings().setJavaScriptEnabled(true);
@@ -163,6 +174,7 @@ public class ChartFrag extends Fragment {
      * @param view
      */
     private void initView(View view) {
+
         webView = view.findViewById(R.id.frag_chart_webview);
     }
 
@@ -190,4 +202,10 @@ public class ChartFrag extends Fragment {
         }
     });
 
+    /********************************* 生命周期 **************************************/
+    @Override
+    public void onResume() {
+        super.onResume();
+        initThread();
+    }
 }

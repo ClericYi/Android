@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <shape xmlns:android="http://schemas.android.com/apk/res/android">
     <corners android:radius="10dp"/>
-    <solid android:color="@color/login_button_active"/>
+    <solid android:color="@color/online_true"/>
     <padding android:right="20dp" android:left="20dp" android:top="10dp" android:bottom="10dp"/>
 </shape>
