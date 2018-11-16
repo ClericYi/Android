@@ -1,6 +1,7 @@
 package com.raspi.easyfarming.spot.view;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
@@ -8,22 +9,29 @@ import android.os.Message;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.DividerItemDecoration;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import com.alibaba.fastjson.JSONArray;
 import com.othershe.baseadapter.ViewHolder;
 import com.othershe.baseadapter.interfaces.OnItemClickListener;
 import com.raspi.easyfarming.R;
 import com.raspi.easyfarming.spot.adapter.SpotAdapter;
 import com.raspi.easyfarming.utils.okhttp.okHttpClientModel;
 
+import org.angmarch.views.NiceSpinner;
 import org.eclipse.paho.android.service.MqttAndroidClient;
 import org.eclipse.paho.client.mqttv3.DisconnectedBufferOptions;
 import org.eclipse.paho.client.mqttv3.IMqttActionListener;
@@ -52,25 +60,30 @@ public class SpotFrag extends Fragment {
     private final int GET_SUCCESS = 1;
     private final int GET_FAIL = 2;
     private final int GET_ERROR = 3;
-    private final int TEMP = 4;
-    private final int HUMID = 5;
-    private final int PRESSURE = 6;
-    private final int ILLUMINANCE = 7;
-    private final int RAIN = 8;
+    private final int DATA_CHANGE = 4;
+    private final int  GETALLGROUP_FAIL = 5;
+    private final int  GETALLGROUP_SUCCESS = 6;
+    private final int  GETALLGROUP_ERROR = 7;
+
 
     //控件
     private RecyclerView recyclerView;
+    private NiceSpinner spinner;
 
     //handler
     private Handler handler;
 
     //适配器
     private SpotAdapter spotAdapter;
+    private ArrayAdapter<String> groupAdapter;
 
     //数据
     private List<Map> listMap;
     private int PAGE = 0;
     private final int Size = 20;
+    private List<String> groups;
+    private List<String> groupName;
+    private List<String> groupNum;
 
     //mqtt
     private String[] RECENVETOPICFORMAT;
@@ -78,7 +91,6 @@ public class SpotFrag extends Fragment {
     String serverUri = "tcp://39.108.153.134:1883";
     String deviceId = "websocket_client";
     private boolean connectSuccess;
-    private String[] point;
 
     //View
     private View view;
@@ -139,7 +151,7 @@ public class SpotFrag extends Fragment {
             @Override
             public void connectionLost(Throwable cause) {
                 connectSuccess = false;
-                Log.e(TAG, "The Connection was lost." + cause.getLocalizedMessage());
+                Log.e(TAG, "The Connection was lost.");
             }
 
             // THIS DOES NOT WORK!
@@ -253,38 +265,25 @@ public class SpotFrag extends Fragment {
             public void run() {
                 for(int i=0; i<RECENVETOPICFORMAT.length; i++) {
                     if(gatewayId.equals(RECENVETOPICFORMAT[i])){
-                        if(RECENVETOPICFORMAT[i].indexOf("TEMP")!=-1) {
-                            listMap.get(i).put("value", message);
-                            handler.sendEmptyMessage(TEMP);
-                        }else if(RECENVETOPICFORMAT[i].indexOf("HUMID")!=-1) {
-                            listMap.get(i).put("value", message);
-                            handler.sendEmptyMessage(HUMID);
-                        }else if(RECENVETOPICFORMAT[i].indexOf("RAIN")!=-1) {
-                            listMap.get(i).put("value", message);
-                            handler.sendEmptyMessage(RAIN);
-                        }else if(RECENVETOPICFORMAT[i].indexOf("ILLUMINANCE")!=-1) {
-                            listMap.get(i).put("value", message);
-                            handler.sendEmptyMessage(ILLUMINANCE);
-                        }else if(RECENVETOPICFORMAT[i].indexOf("PRESSURE")!=-1) {
-                            listMap.get(i).put("value", message);
-                            handler.sendEmptyMessage(PRESSURE);
+                        if (!listMap.get(i).get("value").equals(message)) {
+                            if (RECENVETOPICFORMAT[i].substring(12).indexOf("TEMP") != -1) {
+                                listMap.get(i).put("value", message);
+                            } else if (RECENVETOPICFORMAT[i].substring(12).indexOf("HUMID") != -1) {
+                                listMap.get(i).put("value", message);
+                            } else if (RECENVETOPICFORMAT[i].substring(12).indexOf("RAIN") != -1) {
+                                listMap.get(i).put("value", message);
+                            } else if (RECENVETOPICFORMAT[i].substring(12).indexOf("ILL") != -1) {
+                                listMap.get(i).put("value", message);
+                            } else if (RECENVETOPICFORMAT[i].substring(12).indexOf("PRE") != -1) {
+                                listMap.get(i).put("value", message);
+                            }
+                            handler.sendEmptyMessage(DATA_CHANGE);
                         }
-                        break;
+                        return;
                     }
                 }
             }
         }).start();
-    }
-
-    private void close() {
-        if (mqttAndroidClient != null) {
-            try {
-                mqttAndroidClient.disconnect();
-                mqttAndroidClient.unregisterResources();
-            } catch (MqttException e) {
-                e.printStackTrace();
-            }
-        }
     }
 
 
@@ -299,9 +298,16 @@ public class SpotFrag extends Fragment {
             @Override
             public void run() {
                 try{
-                    Request request  = new Request.Builder()
-                            .url(getContext().getResources().getString(R.string.URL_User_getAllOnlineDevicesByAppUser)+PAGE+"/"+Size)
-                            .build();
+                    Request request = null;
+                    if(spinner.getSelectedIndex()==0) {
+                        request = new Request.Builder()
+                                .url(getContext().getResources().getString(R.string.URL_User_getAllOnlineDevicesByAppUser) + PAGE + "/" + Size)
+                                .build();
+                    }else{
+                        request= new Request.Builder()
+                                .url(getContext().getResources().getString(R.string.URL_User_getAllOnlineDevicesByAppUserByGroup)+groupNum.get(spinner.getSelectedIndex())+"/"+ PAGE + "/" + Size)
+                                .build();
+                    }
 
                     Response response = okHttpClientModel.INSTANCE.getMOkHttpClient().newCall(request).execute();
 
@@ -364,9 +370,74 @@ public class SpotFrag extends Fragment {
         }).start();
     }
 
+    /**
+     * 获得所有分组线程
+     */
+    public void getAllGroupThread(){
+        groupName = new ArrayList<String>();
+        groupNum = new ArrayList<String>();
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    String url = getContext().getResources().getString(R.string.URL_Device_GetAllGroups);
+
+                    Request request = new Request.Builder()
+                            .url(url)
+                            .build();
+
+                    Response response = okHttpClientModel.INSTANCE.getMOkHttpClient().newCall(request).execute();
+
+                    String result = response.body().string();
+                    Log.e(TAG, result, null);
+                    List<String> result_Groups = JSONArray.parseArray(parseObject(result).get("data").toString(), String.class);
+
+                    if(result_Groups.size()<1){
+                        handler.sendEmptyMessage(GETALLGROUP_FAIL);
+                        return;
+                    }else {
+                        for (int i = 0; i < result_Groups.size(); i++) {
+                            groupName.add(parseObject(result_Groups.get(i)).get("name").toString());
+                            groupNum.add(parseObject(result_Groups.get(i)).get("id").toString());
+                        }
+                        handler.sendEmptyMessage(GETALLGROUP_SUCCESS);
+                    }
+
+                }catch (Exception e){
+                    e.printStackTrace();
+                    handler.sendEmptyMessage(GETALLGROUP_ERROR);
+                }
+            }
+        }).start();
+    }
 
     /************************ 初始化  ******************************/
 
+    /**
+     * 初始化Spinner
+     */
+    private void initGroup(){
+        groups = new ArrayList<>();
+        groups.add("所有设备");
+        if(groupName.size()>0) {
+            groups.addAll(groupName);
+        }
+        groupAdapter = new ArrayAdapter<String>(getContext(), android.R.layout.simple_spinner_item, groups);
+        groupAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinner.setAdapter(groupAdapter);
+
+        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                getAllOnlineDevicesByAppUserThread();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+
+            }
+        });
+    }
 
     /**
      * 为RcycleView增加下拉加载
@@ -398,6 +469,7 @@ public class SpotFrag extends Fragment {
      * 初始化线程
      */
     private void initThread() {
+        getAllGroupThread();
         getAllOnlineDevicesByAppUserThread();
     }
 
@@ -411,8 +483,7 @@ public class SpotFrag extends Fragment {
         //页面缓冲
         View emptyView = LayoutInflater.from(getContext()).inflate(R.layout.load_empty, (ViewGroup) recyclerView.getParent(), false);
         spotAdapter.setEmptyView(emptyView);
-        spotAdapter.setLoadingView(R.layout.load_loading);
-        spotAdapter.setLoadEndView(R.layout.load_end);
+
         spotAdapter.setOnItemClickListener(new OnItemClickListener<Map>() {
             @Override
             public void onItemClick(ViewHolder viewHolder, Map map, int i) {
@@ -426,9 +497,7 @@ public class SpotFrag extends Fragment {
 
         recyclerView.setAdapter(spotAdapter);
         //设置样式
-        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        recyclerView.setHasFixedSize(true);
-        recyclerView.setItemAnimator(new DefaultItemAnimator());
+        recyclerView.setLayoutManager(new GridLayoutManager(getContext(), 2));
     }
 
     /**
@@ -437,6 +506,7 @@ public class SpotFrag extends Fragment {
      */
     private void initView(View view) {
         recyclerView = view.findViewById(R.id.frag_spot_rv);
+        spinner = view.findViewById(R.id.frag_spot_spinner);
     }
 
     /**
@@ -448,47 +518,34 @@ public class SpotFrag extends Fragment {
             public boolean handleMessage(Message msg) {
                 switch (msg.what){
                     case GET_SUCCESS:
-                        //初始化
-                        if(listMap.size()%Size!=0){
-                            spotAdapter.loadEnd();
-                        }
-                        Log.e("Spot", "Success", null);
 //                        initSDK(getContext(), RECENVETOPICFORMAT);
 //                        connectServer();
                         PAGE++;
                         spotAdapter.notifyDataSetChanged();
                         break;
                     case GET_FAIL:
-                        if(listMap.size()<1) {
-                            spotAdapter.removeEmptyView();
-                            View reloadLayout = LayoutInflater.from(getContext()).inflate(R.layout.load_reload, (ViewGroup) recyclerView.getParent(), false);
-                            reloadLayout.findViewById(R.id.load_reload_btn).setOnClickListener(new View.OnClickListener() {
-                                @Override
-                                public void onClick(View v) {
-                                    getAllOnlineDevicesByAppUserThread();
-                                }
-                            });
-                            spotAdapter.setReloadView(reloadLayout);
-                            Toast.makeText(getContext(), "没有在线的监控设备,点击按钮重试获取", Toast.LENGTH_SHORT).show();
-                        }else{
-                            spotAdapter.loadEnd();
-                        }
+                        View reload = LayoutInflater.from(getContext()).inflate(R.layout.load_reload,(ViewGroup)recyclerView.getParent(), false);
+                        reload.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                getAllOnlineDevicesByAppUserThread();
+                            }
+                        });
                         Log.e("Spot", "Get_FAIL", null);
                         break;
-                    case TEMP:
+                    case DATA_CHANGE:
                         spotAdapter.notifyDataSetChanged();
                         break;
-                    case HUMID:
-                        spotAdapter.notifyDataSetChanged();
+                    case GETALLGROUP_SUCCESS:
+                        initGroup();
+                        Log.e(TAG, "获取所有分组成功", null);
                         break;
-                    case PRESSURE:
-                        spotAdapter.notifyDataSetChanged();
+                    case GETALLGROUP_FAIL:
+                        initGroup();
+                        Log.e(TAG, "获取所有分组失败", null);
                         break;
-                    case ILLUMINANCE:
-                        spotAdapter.notifyDataSetChanged();
-                        break;
-                    case RAIN:
-                        spotAdapter.notifyDataSetChanged();
+                    case GETALLGROUP_ERROR:
+                        Log.e(TAG, "获取所有分组失败", null);
                         break;
                 }
                 return false;
@@ -497,11 +554,6 @@ public class SpotFrag extends Fragment {
     }
 
     /***************** 生命周期*************************/
-    @Override
-    public void onDestroy() {
-        close();
-        super.onDestroy();
-    }
 
     @Override
     public void onResume() {

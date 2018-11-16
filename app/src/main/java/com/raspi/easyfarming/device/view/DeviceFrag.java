@@ -701,7 +701,7 @@ public class DeviceFrag extends Fragment implements AMapLocationListener {
                         if(devices.size()<1) {
                             listAdapter.removeEmptyView();
                             final View reloadLayout = LayoutInflater.from(getContext()).inflate(R.layout.load_reload, (ViewGroup) device_rv.getParent(), false);
-                            reloadLayout.findViewById(R.id.load_reload_btn).setOnClickListener(new View.OnClickListener() {
+                            reloadLayout.setOnClickListener(new View.OnClickListener() {
                                 @Override
                                 public void onClick(View v) {
                                     getAllDevicesThread();

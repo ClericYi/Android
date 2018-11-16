@@ -23,6 +23,7 @@ import com.raspi.easyfarming.utils.okhttp.okHttpClientModel
 import com.raspi.easyfarming.utils.network.NetBroadcastReceiver
 import kotlinx.android.synthetic.main.activity_login.*
 import kotlinx.android.synthetic.main.activity_login.view.*
+import kotlinx.android.synthetic.main.sample_video_land.view.*
 import okhttp3.*
 import java.util.ArrayList
 import java.util.HashMap
@@ -137,8 +138,12 @@ class LoginActivity : AppCompatActivity() {
             if((login_username.text.toString().equals("")||login_password.text.toString().equals(""))
                 ||(login_username.text.toString().equals(null)||login_password.text.toString().equals(null)))
                 Toast.makeText(baseContext,"请输入账号或密码", Toast.LENGTH_SHORT).show()
-            else
+            else {
+                login_button.isEnabled = false
+                login_button.background = resources.getDrawable(R.drawable.ic_login_button_false,null)
+                login_button.text = "登录中"
                 startLoginThread()
+            }
         })
     }
 
@@ -176,10 +181,14 @@ class LoginActivity : AppCompatActivity() {
                     finish()
                 }
                 LOGIN_FAIL -> {
+                    login_button.isEnabled = true
+                    login_button.background = resources.getDrawable(R.drawable.ic_login_button,null)
                     Log.e(TAG, "登陆失败，请检查您的账号和密码", null)
                     Toast.makeText(self, "登陆失败，请检查您的账号和密码", Toast.LENGTH_SHORT).show()
                 }
                 LOGIN_ERROR -> {
+                    login_button.isEnabled = true
+                    login_button.background = resources.getDrawable(R.drawable.ic_login_button,null)
                     Log.e(TAG, "出现未知异常", null)
                     Toast.makeText(self, "出现未知异常", Toast.LENGTH_SHORT).show()
                 }

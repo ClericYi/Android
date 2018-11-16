@@ -20,29 +20,45 @@ public class SpotAdapter extends CommonBaseAdapter<Map> {
         viewHolder.setText(R.id.item_spot_text, map.get("name").toString());
         switch (map.get("type").toString()){
             case "TEMP":
-                viewHolder.setText(R.id.item_spot_data, map.get("value").toString()+'℃');
+                if(map.get("value").toString().indexOf("load")!=-1) {
+                    viewHolder.setText(R.id.item_spot_data, mContext.getResources().getString(R.string.spot_load));
+                }else {
+                    viewHolder.setText(R.id.item_spot_data, map.get("value").toString() + '℃');
+                }
                 ((ImageView)viewHolder.getView(R.id.item_spot_img)).setImageDrawable(mContext.getDrawable(R.drawable.ic_temp));
                 break;
             case "HUMID":
-                viewHolder.setText(R.id.item_spot_data, map.get("value").toString()+'％');
+                if(map.get("value").toString().indexOf("load")!=-1) {
+                    viewHolder.setText(R.id.item_spot_data, mContext.getResources().getString(R.string.spot_load));
+                }else {
+                    viewHolder.setText(R.id.item_spot_data, map.get("value").toString() + '％');
+                }
                 ((ImageView)viewHolder.getView(R.id.item_spot_img)).setImageDrawable(mContext.getDrawable(R.drawable.ic_humid));
                 break;
             case "PRESSURE":
-                viewHolder.setText(R.id.item_spot_data, map.get("value").toString()+"hPa");
+                if(map.get("value").toString().indexOf("load")!=-1) {
+                    viewHolder.setText(R.id.item_spot_data, mContext.getResources().getString(R.string.spot_load));
+                }else {
+                    viewHolder.setText(R.id.item_spot_data, map.get("value").toString() + "hPa");
+                }
                 ((ImageView)viewHolder.getView(R.id.item_spot_img)).setImageDrawable(mContext.getDrawable(R.drawable.ic_pressure));
                 break;
             case "RAIN":
-                if(map.get("value").toString().equals("loading...")) {
-                    viewHolder.setText(R.id.item_spot_data, "loading...");
+                if(map.get("value").toString().indexOf("load")!=-1) {
+                    viewHolder.setText(R.id.item_spot_data, mContext.getResources().getString(R.string.spot_load));
                 }else if(Float.parseFloat(map.get("value").toString())>100){
-                    viewHolder.setText(R.id.item_spot_data, "下雨中");
+                    viewHolder.setText(R.id.item_spot_data, "下雨");
                 }else{
-                    viewHolder.setText(R.id.item_spot_data, "未下雨");
+                    viewHolder.setText(R.id.item_spot_data, "晴天");
                 }
                 ((ImageView)viewHolder.getView(R.id.item_spot_img)).setImageDrawable(mContext.getDrawable(R.drawable.ic_rain));
                 break;
             case "ILLUMINANCE":
-                viewHolder.setText(R.id.item_spot_data, map.get("value").toString()+"lx");
+                if(map.get("value").toString().indexOf("load")!=-1) {
+                    viewHolder.setText(R.id.item_spot_data, mContext.getResources().getString(R.string.spot_load));
+                }else {
+                    viewHolder.setText(R.id.item_spot_data, map.get("value").toString() + "lx");
+                }
                 ((ImageView)viewHolder.getView(R.id.item_spot_img)).setImageDrawable(mContext.getDrawable(R.drawable.ic_ill));
                 break;
             case "LIVE":

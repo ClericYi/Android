@@ -24,6 +24,7 @@
     <string name="URL_User_GetAllDeviceLocationByUser">http://39.108.153.134/api/device/getAllDeviceLocationByUser</string>
     <string name="URL_User_UpdateUser">http://39.108.153.134/api/user/updateUser</string>
     <string name="URL_User_ChangePassword">http://39.108.153.134/api/user/changePassword</string>
+    <string name="URL_User_getAllOnlineDevicesByAppUserByGroup">http://39.108.153.134/api/user/getAllOnlineDevicesByAppUserSortByGroup/</string>
 
     <!-- 登录 -->
     <string name="login_next">登录</string>
@@ -82,7 +83,7 @@
     <string name="device_detail_location_latitude">位置纬度</string>
 
     <!-- 重载 -->
-    <string name="reload">重新加载</string>
+    <string name="reload">EasyFarming提醒您\n点击重试</string>
 
     <!-- 手机号 -->
     <string name="phone">新手机号</string>
@@ -103,4 +104,8 @@
     <string name="change_phone">手机号:</string>
     <string name="password">新密码:</string>
     <string name="retry_password">再次输入:</string>
+
+    <!-- spot -->
+    <string name="spot_load">获取中</string>
+
 </resources>

@@ -7,6 +7,7 @@ import android.content.res.Configuration;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.support.annotation.UiThread;
 import android.support.v4.widget.NestedScrollView;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -25,8 +26,11 @@ import com.shuyu.gsyvideoplayer.listener.LockClickListener;
 import com.shuyu.gsyvideoplayer.utils.OrientationUtils;
 import com.shuyu.gsyvideoplayer.video.base.GSYVideoPlayer;
 
+import java.sql.Time;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -80,7 +84,6 @@ public class VideoActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_video);
         ButterKnife.bind(this);
-        initDialog();//初始化弹窗
         initObject();//初始化数据
         initThread();//初始化线程
         initClick();//初始化点击事件
@@ -177,7 +180,9 @@ public class VideoActivity extends AppCompatActivity {
     }
 
 
-
+    /**
+     * 获取M3U8格式
+     */
     private void getM3u8UrlThread(){
         new Thread(new Runnable() {
             @Override
@@ -208,6 +213,9 @@ public class VideoActivity extends AppCompatActivity {
         }).start();
     }
 
+    /**
+     * 获取RTMP视频
+     */
     private void getRtmpUrlThread(){
         new Thread(new Runnable() {
             @Override
@@ -270,15 +278,6 @@ public class VideoActivity extends AppCompatActivity {
         if(intent!=null&& intent.hasExtra("id")){
             id = intent.getStringExtra("id");
         }
-    }
-
-    /**
-     * 初始化弹窗
-     */
-    private void initDialog() {
-        dialog = new ProgressDialog(getBaseContext());
-        dialog.setCanceledOnTouchOutside(false);
-        dialog.setMessage("加载中...");
     }
 
     /**
@@ -417,7 +416,6 @@ public class VideoActivity extends AppCompatActivity {
         public boolean handleMessage(Message msg) {
             switch (msg.what){
                 case GET_SUCCESS:
-                    dialog.dismiss();
                     initVideo();//初始化视频
                     Log.e(TAG, "GET_SUCCESS", null);
                     break;
@@ -426,7 +424,6 @@ public class VideoActivity extends AppCompatActivity {
                     Log.e(TAG, "GET_FAIL", null);
                     break;
                 case GET_ERROR:
-                    dialog.dismiss();
                     Log.e(TAG, "GET_ERROR", null);
                     break;
                 case START_ERROR:

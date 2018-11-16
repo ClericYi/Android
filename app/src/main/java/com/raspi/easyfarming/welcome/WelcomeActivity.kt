@@ -19,7 +19,7 @@ class WelcomeActivity:AppCompatActivity(){
 
     //常量
     private val GOTO = 1
-    private val DELAY_TIME:Long = 2000
+    private val DELAY_TIME:Long = 1500
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

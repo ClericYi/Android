@@ -1,55 +1,37 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
+    android:layout_height="135dp"
+    app:cardCornerRadius="10dp"
+    android:layout_marginStart="5dp"
+    android:layout_marginEnd="5dp"
+    android:layout_marginTop="5dp"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
+    <TextView
+        android:id="@+id/item_spot_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:typeface="serif"
+        android:textSize="10sp"
+        android:layout_marginTop="10dp"/>
 
-    <android.support.constraint.ConstraintLayout
-        android:id="@+id/item_spot_cl"
-        android:layout_width="match_parent"
+    <ImageView
+        android:id="@+id/item_spot_img"
+        android:layout_width="60dp"
         android:layout_height="60dp"
-        android:background="@drawable/ic_spot_text"
-        app:layout_constraintTop_toTopOf="parent"
+        android:src="@drawable/ic_device_self"
+        android:layout_gravity="center_horizontal"
         android:layout_marginTop="30dp"
-        >
+        />
 
-        <TextView
-            android:id="@+id/item_spot_text"
-            android:layout_width="wrap_content"
-            android:layout_height="60dp"
-            android:textSize="20sp"
-            android:gravity="center"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"
-            />
-
-        <ImageView
-            android:id="@+id/item_spot_img"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            android:layout_marginEnd="20dp"
-            />
-
-    </android.support.constraint.ConstraintLayout>
-
-
-        <TextView
-            android:id="@+id/item_spot_data"
-            android:layout_width="0dp"
-            android:layout_height="100dp"
-            android:textSize="40dp"
-            android:gravity="center"
-            android:background="@drawable/ic_spot_data"
-            app:layout_constraintTop_toBottomOf="@+id/item_spot_cl"
-            app:layout_constraintStart_toStartOf="@+id/item_spot_cl"
-            app:layout_constraintEnd_toEndOf="@+id/item_spot_cl"
-            />
-
-
-</android.support.constraint.ConstraintLayout>
+    <TextView
+        android:id="@+id/item_spot_data"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="100dp"
+        android:layout_gravity="center_horizontal"
+        android:textSize="18sp"
+        />
+</android.support.v7.widget.CardView>

@@ -153,10 +153,10 @@ public class MapFrag extends Fragment {
         if (aMap == null) {
             aMap = mapView.getMap();
             //设置显示定位按钮 并且可以点击
-//            UiSettings settings = aMap.getUiSettings();
+            UiSettings settings = aMap.getUiSettings();
             // 是否显示定位按钮
-//            settings.setMyLocationButtonEnabled(true);
-            aMap.setMyLocationEnabled(false);//显示定位层并且可以触发定位,默认是flase
+            settings.setMyLocationButtonEnabled(true);
+            aMap.setMyLocationEnabled(true);//显示定位层并且可以触发定位,默认是flase
         }
     }
 

@@ -262,7 +262,7 @@ public class TriggersActivity extends AppCompatActivity {
                         if(triggers.size()<0){
                             triggersAdapter.removeEmptyView();
                             View reloadLayout = LayoutInflater.from(getBaseContext()).inflate(R.layout.load_reload, (ViewGroup) trigger_rv.getParent(), false);
-                            reloadLayout.findViewById(R.id.load_reload_btn).setOnClickListener(new View.OnClickListener() {
+                            reloadLayout.setOnClickListener(new View.OnClickListener() {
                                 @Override
                                 public void onClick(View v) {
                                     getAllTriggerThread();

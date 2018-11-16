@@ -3,7 +3,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="110dp"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:animateLayoutChanges="true"
+    >
 
 
     <CheckBox
@@ -57,7 +59,7 @@
         android:ems="10"
         android:singleLine="true"
         android:background="@drawable/item_device_control"
-        android:hint="reboot/ping"
+        android:hint="请输入指令"
         app:layout_constraintTop_toBottomOf="@id/item_device_img"
         app:layout_constraintStart_toEndOf="@id/item_device_rb"
         app:layout_constraintEnd_toStartOf="@id/item_device_send"
@@ -72,7 +74,7 @@
         android:id="@+id/item_device_send"
         android:layout_width="60dp"
         android:layout_height="0dp"
-        android:textSize="13dp"
+        android:textSize="13sp"
         android:text="发送"
         app:layout_constraintTop_toBottomOf="@id/item_device_img"
         app:layout_constraintBottom_toBottomOf="parent"
