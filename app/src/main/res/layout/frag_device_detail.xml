@@ -15,21 +15,12 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
-            <!--<ImageView-->
-                <!--android:id="@+id/device_detail_img"-->
-                <!--android:layout_width="60dp"-->
-                <!--android:layout_height="130dp"-->
-                <!--android:src="@drawable/ic_device_self"-->
-                <!--app:layout_constraintTop_toTopOf="parent"-->
-                <!--app:layout_constraintStart_toStartOf="parent"-->
-                <!--app:layout_constraintEnd_toEndOf="parent"-->
-                <!--/>-->
             <TextView
                 android:id="@+id/device_detail_baseinfo_text"
                 android:layout_width="match_parent"
                 android:layout_height="30dp"
-                android:text="基础信息"
-                android:textSize="20dp"
+                android:text="@string/baseinfo"
+                android:textSize="20sp"
                 android:gravity="center_vertical"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -52,8 +43,8 @@
                 android:id="@+id/device_detail_moreinfo_text"
                 android:layout_width="match_parent"
                 android:layout_height="30dp"
-                android:text="详情信息"
-                android:textSize="20dp"
+                android:text="@string/moreinfo"
+                android:textSize="20sp"
                 android:gravity="center_vertical"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -71,16 +62,6 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/device_detail_moreinfo_text"
                 />
-
-            <!-- 存放温度指示 -->
-
-            <!-- 存放湿度 -->
-
-            <!-- 存放气压 -->
-
-            <!-- 存放光敏 -->
-
-            <!-- 存放雨滴 -->
 
         </android.support.constraint.ConstraintLayout>
     </ScrollView>

@@ -7,10 +7,11 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.net.ConnectivityManager;
+import android.net.Network;
+import android.net.NetworkRequest;
 import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.annotation.RequiresApi;
@@ -24,14 +25,17 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.MenuItem;
-import android.widget.Toast;
 
+import com.amap.api.location.AMapLocation;
+import com.amap.api.location.AMapLocationClient;
+import com.amap.api.location.AMapLocationClientOption;
+import com.amap.api.location.AMapLocationListener;
+import com.blankj.utilcode.util.ToastUtils;
 import com.raspi.easyfarming.R;
 import com.raspi.easyfarming.device.view.DeviceCenterFrag;
 import com.raspi.easyfarming.spot.view.SpotCenterFrag;
-import com.raspi.easyfarming.spot.view.SpotFrag;
 import com.raspi.easyfarming.user.view.UserFrag;
-import com.raspi.easyfarming.utils.network.NetBroadcastReceiver;
+import com.raspi.easyfarming.utils.gps.Location;
 
 import org.eclipse.paho.android.service.MqttAndroidClient;
 import org.eclipse.paho.client.mqttv3.DisconnectedBufferOptions;
@@ -44,20 +48,19 @@ import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements AMapLocationListener {
 
     //常量
     private MainActivity self = MainActivity.this;
     private final String TAG ="MainAcitivity";
-
-    //广播
-    private NetBroadcastReceiver netBroadcastReceiver;
 
     //控件
     @BindView(R.id.main_bnv)
@@ -99,6 +102,7 @@ public class MainActivity extends AppCompatActivity {
         initPager();//初始化ViewPager
         initBottomNav();//初始化bottomNavigationView
         initIntentObject();//初始化数据
+        initGPS();//初始化定位
         //MQTT初始化
         initSDK(this, RECENVETOPICFORMAT);
         connectServer();
@@ -218,32 +222,32 @@ public class MainActivity extends AppCompatActivity {
      * 初始化网络广播
      */
     private void initNetBoardcastReceiver() {
-        if (netBroadcastReceiver == null) {
-            netBroadcastReceiver = new NetBroadcastReceiver();
-            netBroadcastReceiver.setNetChangeListern(new NetBroadcastReceiver.NetChangeListener() {
+        ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        // 请注意这里会有一个版本适配bug，所以请在这里添加非空判断
+        if (connectivityManager != null) {
+            connectivityManager.requestNetwork(new NetworkRequest.Builder().build(), new ConnectivityManager.NetworkCallback() {
+                /**
+                 * 网络可用的回调
+                 */
                 @Override
-                public void onChangeListener(boolean status) {
-                    if (status) {
-
-
-                    } else {
-                        Toast.makeText(self, "无可用的网络，请连接网络", Toast.LENGTH_SHORT).show();
-                    }
+                public void onAvailable(Network network) {
+                    super.onAvailable(network);
+                    Log.e(TAG, "onAvailable");
+                }
+                /**
+                 * 网络丢失的回调
+                 */
+                @Override
+                public void onLost(Network network) {
+                    super.onLost(network);
+                    ToastUtils.showShort("无可用的网络，请连接网络");
                 }
             });
         }
-        IntentFilter filter = new IntentFilter();
-        filter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
-        registerReceiver(netBroadcastReceiver, filter);
     }
 
     /***********************    生命周期中的操作    ****************************/
 
-    @Override
-    protected void onPause() {
-        super.onPause();
-        unregisterReceiver(netBroadcastReceiver);
-    }
 
     @Override
     protected void onResume() {
@@ -481,4 +485,58 @@ public class MainActivity extends AppCompatActivity {
         }
         return super.onKeyDown(keyCode, event);
     }
+    /************************************ 定位******************************************/
+    /**
+     * 实现GPS的方法
+     */
+    public void initGPS() {
+        //AmapGPS
+        AMapLocationClient mlocationClient;
+        AMapLocationClientOption mLocationOption = null;
+        Log.e(TAG, "GPS", null);
+        mlocationClient = new AMapLocationClient(getBaseContext());
+        //初始化定位参数
+        mLocationOption = new AMapLocationClientOption();
+        //设置定位监听
+        mlocationClient.setLocationListener(this);
+        //设置定位模式为高精度模式，Battery_Saving为低功耗模式，Device_Sensors是仅设备模式
+        mLocationOption.setLocationMode(AMapLocationClientOption.AMapLocationMode.Hight_Accuracy);
+        //设置定位间隔,单位毫秒,默认为2000ms
+        mLocationOption.setInterval(20000);
+        //设置定位参数
+        mlocationClient.setLocationOption(mLocationOption);
+        // 此方法为每隔固定时间会发起一次定位请求，为了减少电量消耗或网络流量消耗，
+        // 注意设置合适的定位时间的间隔（最小间隔支持为1000ms），并且在合适时间调用stopLocation()方法来取消定位请求
+        // 在定位结束后，在合适的生命周期调用onDestroy()方法
+        // 在单次定位情况下，定位无论成功与否，都无需调用stopLocation()方法移除请求，定位sdk内部会移除
+        //启动定位
+        mlocationClient.startLocation();
+    }
+
+    /**
+     * 定位监听事件
+     *
+     * @param aMapLocation
+     */
+    @Override
+    public void onLocationChanged(AMapLocation aMapLocation) {
+        if (aMapLocation != null) {
+            if (aMapLocation.getErrorCode() == 0) {
+                //定位成功回调信息，设置相关消息
+                aMapLocation.getLocationType();//获取当前定位结果来源，如网络定位结果，详见定位类型表
+                Location.INSTANCE.setLatitude(String.format("%.2f", aMapLocation.getLatitude()));//获取纬度
+                Location.INSTANCE.setLongitude(String.format("%.2f", aMapLocation.getLongitude()));//获取经度
+                aMapLocation.getAccuracy();//获取精度信息
+                SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                Date date = new Date(aMapLocation.getTime());
+                df.format(date);//定位时间
+            } else {
+                //显示错误信息ErrCode是错误码，errInfo是错误信息，详见错误码表。
+                Log.e("AmapError", "location Error, ErrCode:"
+                        + aMapLocation.getErrorCode() + ", errInfo:"
+                        + aMapLocation.getErrorInfo());
+            }
+        }
+    }
+
 }

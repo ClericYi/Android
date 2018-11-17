@@ -64,7 +64,7 @@ class UserFrag : Fragment() {
     }
 
     private fun intUser() {
-        frag_user.item_user_ic.background = context?.resources?.getDrawable(R.drawable.ic_user_head)
+        frag_user.item_user_ic.background = context?.resources?.getDrawable(R.drawable.ic_user_head, null)
         frag_user.item_user_tv.text = "用户管理"
     }
 

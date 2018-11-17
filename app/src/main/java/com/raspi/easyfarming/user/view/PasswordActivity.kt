@@ -1,8 +1,8 @@
 package com.raspi.easyfarming.user.view
 
 import android.annotation.SuppressLint
-import android.content.IntentFilter
-import android.net.ConnectivityManager
+import android.content.Context
+import android.net.*
 import android.os.Bundle
 import android.os.Handler
 import android.os.Message
@@ -12,8 +12,8 @@ import android.util.Log
 import android.view.MenuItem
 import android.view.View
 import android.widget.Toast
+import com.blankj.utilcode.util.ToastUtils
 import com.raspi.easyfarming.R
-import com.raspi.easyfarming.utils.network.NetBroadcastReceiver
 import com.raspi.easyfarming.utils.okhttp.okHttpClientModel
 import kotlinx.android.synthetic.main.activity_password.*
 import kotlinx.android.synthetic.main.item_phone.view.*
@@ -28,10 +28,6 @@ class PasswordActivity: AppCompatActivity(){
     private val CHANGE_SUCCESS = 0
     private val CHANGE_FAILED = 1
     private val CHANGE_ERROR = 2
-
-    //广播
-    private var netBroadcastReceiver: NetBroadcastReceiver?=null
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -134,30 +130,28 @@ class PasswordActivity: AppCompatActivity(){
      * 初始化网络广播
      */
     private fun initNetBoardcastReceiver() {
-        //Log.e(TAG, "广播监听中", null)
-        if (netBroadcastReceiver == null) {
-            netBroadcastReceiver = NetBroadcastReceiver()
-            netBroadcastReceiver?.setNetChangeListern(object : NetBroadcastReceiver.NetChangeListener {
-                override fun onChangeListener(status: Boolean) {
-                    if (status) {
-                        /*startCompanyThread();*/
-                    } else {
-                        Toast.makeText(baseContext, "无可用的网络，请连接网络", Toast.LENGTH_SHORT).show()
-                    }
-                }
-            })
-        }
-        val filter = IntentFilter()
-        filter.addAction(ConnectivityManager.CONNECTIVITY_ACTION)
-        registerReceiver(netBroadcastReceiver, filter)
+        val connectivityManager = getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        // 请注意这里会有一个版本适配bug，所以请在这里添加非空判断
+        connectivityManager?.requestNetwork(NetworkRequest.Builder().build(), object : ConnectivityManager.NetworkCallback() {
+            /**
+             * 网络可用的回调
+             */
+            override fun onAvailable(network: Network) {
+                super.onAvailable(network)
+                Log.e(TAG, "onAvailable")
+            }
+
+            /**
+             * 网络丢失的回调
+             */
+            override fun onLost(network: Network) {
+                super.onLost(network)
+                ToastUtils.showShort("无可用的网络，请连接网络")
+            }
+        })
     }
 
     /***********************    生命周期中的操作    ****************************/
-
-    override fun onPause() {
-        super.onPause()
-        unregisterReceiver(netBroadcastReceiver)
-    }
 
     override fun onResume() {
         super.onResume()

@@ -61,9 +61,10 @@ public class SpotFrag extends Fragment {
     private final int GET_FAIL = 2;
     private final int GET_ERROR = 3;
     private final int DATA_CHANGE = 4;
-    private final int  GETALLGROUP_FAIL = 5;
-    private final int  GETALLGROUP_SUCCESS = 6;
-    private final int  GETALLGROUP_ERROR = 7;
+    private final int GETALLGROUP_FAIL = 5;
+    private final int GETALLGROUP_SUCCESS = 6;
+    private final int GETALLGROUP_ERROR = 7;
+    private final int GET_EMPTY = 8;
 
 
     //控件
@@ -99,14 +100,14 @@ public class SpotFrag extends Fragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        if(view == null) {
+        if (view == null) {
             view = inflater.from(getContext()).inflate(R.layout.frag_spot_list, null);
         }
         ViewGroup parent = (ViewGroup) view.getParent();
         if (parent != null) {
             parent.removeView(view);
         }
-        if(flag == 0){
+        if (flag == 0) {
             initEach();//初始化所有
         }
         return view;
@@ -120,7 +121,7 @@ public class SpotFrag extends Fragment {
         initHandler();//初始化Handler
         initList();//初始化列表
         initRv();//实现下拉加载
-        flag =1;
+        flag = 1;
     }
 
 
@@ -258,13 +259,13 @@ public class SpotFrag extends Fragment {
     // 处理消息
     private void handleReceivedMessage(final String message, final String gatewayId) {
         //可以发送一条广播通知程序
-        Log.i(TAG, "topic"+gatewayId);
+        Log.i(TAG, "topic" + gatewayId);
         Log.i(TAG, " receive : " + message);
         new Thread(new Runnable() {
             @Override
             public void run() {
-                for(int i=0; i<RECENVETOPICFORMAT.length; i++) {
-                    if(gatewayId.equals(RECENVETOPICFORMAT[i])){
+                for (int i = 0; i < RECENVETOPICFORMAT.length; i++) {
+                    if (gatewayId.equals(RECENVETOPICFORMAT[i])) {
                         if (!listMap.get(i).get("value").equals(message)) {
                             if (RECENVETOPICFORMAT[i].substring(12).indexOf("TEMP") != -1) {
                                 listMap.get(i).put("value", message);
@@ -292,20 +293,20 @@ public class SpotFrag extends Fragment {
     /**
      * 获取在线设备线程
      */
-    private void getAllOnlineDevicesByAppUserThread(){
+    private void getAllOnlineDevicesByAppUserThread() {
         PAGE = 0;
         new Thread(new Runnable() {
             @Override
             public void run() {
-                try{
+                try {
                     Request request = null;
-                    if(spinner.getSelectedIndex()==0) {
+                    if (spinner.getSelectedIndex() == 0) {
                         request = new Request.Builder()
                                 .url(getContext().getResources().getString(R.string.URL_User_getAllOnlineDevicesByAppUser) + PAGE + "/" + Size)
                                 .build();
-                    }else{
-                        request= new Request.Builder()
-                                .url(getContext().getResources().getString(R.string.URL_User_getAllOnlineDevicesByAppUserByGroup)+groupNum.get(spinner.getSelectedIndex())+"/"+ PAGE + "/" + Size)
+                    } else {
+                        request = new Request.Builder()
+                                .url(getContext().getResources().getString(R.string.URL_User_getAllOnlineDevicesByAppUserByGroup) + groupNum.get(spinner.getSelectedIndex()- 1))
                                 .build();
                     }
 
@@ -313,23 +314,28 @@ public class SpotFrag extends Fragment {
 
                     String result = response.body().string();
                     Log.e(TAG, result, null);
+                    String state = parseObject(result).get("state").toString();
 
-                    String data = parseObject(parseObject(result).get("data").toString()).get("data").toString();
 
-                    if(data.equals("[]")){
+                    if (!state.equals("1")) {
                         handler.sendEmptyMessage(GET_FAIL);
-                    }else{
-                        int size = Integer.valueOf(parseObject(parseObject(result).get("data").toString()).get("totalElements").toString());
-                        RECENVETOPICFORMAT = new String[size];
+                    } else {
+                        listMap.clear();
+                        String data = parseObject(parseObject(result).get("data").toString()).get("data").toString();
+                        if (data.equals("[]")) {
+                            handler.sendEmptyMessage(GET_EMPTY);
+                            return;
+                        }
+
                         List<Map> list = parseArray(data, Map.class);
-                        for(int i = 0; i<size; i++){
+                        RECENVETOPICFORMAT = new String[list.size()];
+                        for (int i = 0; i < list.size(); i++) {
                             RECENVETOPICFORMAT[i] = list.get(i).get("topic").toString();
                         }
-                        listMap.clear();
                         listMap.addAll(list);
                         handler.sendEmptyMessage(GET_SUCCESS);
                     }
-                }catch (Exception e){
+                } catch (Exception e) {
                     e.printStackTrace();
                     handler.sendEmptyMessage(GET_ERROR);
                 }
@@ -340,29 +346,30 @@ public class SpotFrag extends Fragment {
     /**
      * 获取在线设备
      */
-    private void getRestOnlineDevicesByAppUserThread(){
+    private void getRestOnlineDevicesByAppUserThread() {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                try{
-                    Request request  = new Request.Builder()
-                            .url(getContext().getResources().getString(R.string.URL_User_getAllOnlineDevicesByAppUser)+PAGE+"/"+Size)
+                try {
+                    Request request = new Request.Builder()
+                            .url(getContext().getResources().getString(R.string.URL_User_getAllOnlineDevicesByAppUser) + PAGE + "/" + Size)
                             .build();
 
                     Response response = okHttpClientModel.INSTANCE.getMOkHttpClient().newCall(request).execute();
 
                     String result = response.body().string();
                     Log.e(TAG, result, null);
+                    String state = parseObject(result).get("state").toString();
 
-                    String data = parseObject(parseObject(result).get("data").toString()).get("data").toString();
 
-                    if(data.equals("[]")){
+                    if (!state.equals("1")) {
                         handler.sendEmptyMessage(GET_FAIL);
-                    }else{
+                    } else {
+                        String data = parseObject(parseObject(result).get("data").toString()).get("data").toString();
                         listMap.addAll(parseArray(data, Map.class));
                         handler.sendEmptyMessage(GET_SUCCESS);
                     }
-                }catch (Exception e){
+                } catch (Exception e) {
                     e.printStackTrace();
                     handler.sendEmptyMessage(GET_ERROR);
                 }
@@ -373,7 +380,7 @@ public class SpotFrag extends Fragment {
     /**
      * 获得所有分组线程
      */
-    public void getAllGroupThread(){
+    public void getAllGroupThread() {
         groupName = new ArrayList<String>();
         groupNum = new ArrayList<String>();
         new Thread(new Runnable() {
@@ -392,10 +399,10 @@ public class SpotFrag extends Fragment {
                     Log.e(TAG, result, null);
                     List<String> result_Groups = JSONArray.parseArray(parseObject(result).get("data").toString(), String.class);
 
-                    if(result_Groups.size()<1){
+                    if (result_Groups.size() < 1) {
                         handler.sendEmptyMessage(GETALLGROUP_FAIL);
                         return;
-                    }else {
+                    } else {
                         for (int i = 0; i < result_Groups.size(); i++) {
                             groupName.add(parseObject(result_Groups.get(i)).get("name").toString());
                             groupNum.add(parseObject(result_Groups.get(i)).get("id").toString());
@@ -403,7 +410,7 @@ public class SpotFrag extends Fragment {
                         handler.sendEmptyMessage(GETALLGROUP_SUCCESS);
                     }
 
-                }catch (Exception e){
+                } catch (Exception e) {
                     e.printStackTrace();
                     handler.sendEmptyMessage(GETALLGROUP_ERROR);
                 }
@@ -416,10 +423,10 @@ public class SpotFrag extends Fragment {
     /**
      * 初始化Spinner
      */
-    private void initGroup(){
+    private void initGroup() {
         groups = new ArrayList<>();
         groups.add("所有设备");
-        if(groupName.size()>0) {
+        if (groupName.size() > 0) {
             groups.addAll(groupName);
         }
         groupAdapter = new ArrayAdapter<String>(getContext(), android.R.layout.simple_spinner_item, groups);
@@ -448,6 +455,9 @@ public class SpotFrag extends Fragment {
             @Override
             public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
                 super.onScrollStateChanged(recyclerView, newState);
+                if (spinner.getSelectedIndex() != 0) {
+                    return;
+                }
                 LinearLayoutManager manager = (LinearLayoutManager) recyclerView.getLayoutManager();
                 if (newState == RecyclerView.SCROLL_STATE_IDLE) {
                     //获取最后一个完全显示的ItemPosition ,角标值
@@ -465,12 +475,12 @@ public class SpotFrag extends Fragment {
             }
         });
     }
+
     /**
      * 初始化线程
      */
     private void initThread() {
         getAllGroupThread();
-        getAllOnlineDevicesByAppUserThread();
     }
 
     /**
@@ -487,7 +497,7 @@ public class SpotFrag extends Fragment {
         spotAdapter.setOnItemClickListener(new OnItemClickListener<Map>() {
             @Override
             public void onItemClick(ViewHolder viewHolder, Map map, int i) {
-                if(map.get("type").toString().equals("LIVE")){
+                if (map.get("type").toString().equals("LIVE")) {
                     Intent intent = new Intent(getContext(), VideoActivity.class);
                     intent.putExtra("id", map.get("id").toString());
                     startActivity(intent);
@@ -497,11 +507,12 @@ public class SpotFrag extends Fragment {
 
         recyclerView.setAdapter(spotAdapter);
         //设置样式
-        recyclerView.setLayoutManager(new GridLayoutManager(getContext(), 2));
+        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
     }
 
     /**
      * 初始化控件
+     *
      * @param view
      */
     private void initView(View view) {
@@ -512,19 +523,38 @@ public class SpotFrag extends Fragment {
     /**
      * 初始化Handler
      */
-    private void initHandler(){
+    private void initHandler() {
         handler = new Handler(new Handler.Callback() {
             @Override
             public boolean handleMessage(Message msg) {
-                switch (msg.what){
+                View reload = null;
+                switch (msg.what) {
                     case GET_SUCCESS:
-//                        initSDK(getContext(), RECENVETOPICFORMAT);
-//                        connectServer();
+                        recyclerView.setLayoutManager(new GridLayoutManager(getContext(), 2));
+                        initSDK(getContext(), RECENVETOPICFORMAT);
+                        connectServer();
                         PAGE++;
                         spotAdapter.notifyDataSetChanged();
                         break;
+                    case GET_EMPTY:
+                        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+                        spotAdapter.removeEmptyView();
+                        spotAdapter.notifyDataSetChanged();
+                        reload = LayoutInflater.from(getContext()).inflate(R.layout.load_reload, (ViewGroup) recyclerView.getParent(), false);
+                        spotAdapter.setReloadView(reload);
+                        reload.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                getAllOnlineDevicesByAppUserThread();
+                            }
+                        });
+                        Log.e("Spot", "Get_Enpty", null);
+                        break;
                     case GET_FAIL:
-                        View reload = LayoutInflater.from(getContext()).inflate(R.layout.load_reload,(ViewGroup)recyclerView.getParent(), false);
+                        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+                        spotAdapter.notifyDataSetChanged();
+                        reload = LayoutInflater.from(getContext()).inflate(R.layout.load_reload, (ViewGroup) recyclerView.getParent(), false);
+                        spotAdapter.setReloadView(reload);
                         reload.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
@@ -538,10 +568,12 @@ public class SpotFrag extends Fragment {
                         break;
                     case GETALLGROUP_SUCCESS:
                         initGroup();
+                        getAllOnlineDevicesByAppUserThread();
                         Log.e(TAG, "获取所有分组成功", null);
                         break;
                     case GETALLGROUP_FAIL:
                         initGroup();
+                        getAllOnlineDevicesByAppUserThread();
                         Log.e(TAG, "获取所有分组失败", null);
                         break;
                     case GETALLGROUP_ERROR:

@@ -2,8 +2,14 @@ package com.raspi.easyfarming.spot.view;
 
 import android.app.DownloadManager;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
+import android.net.ConnectivityManager;
+import android.net.LinkProperties;
+import android.net.Network;
+import android.net.NetworkCapabilities;
+import android.net.NetworkRequest;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -15,6 +21,7 @@ import android.view.View;
 
 import android.widget.RelativeLayout;
 
+import com.blankj.utilcode.util.ToastUtils;
 import com.esp.smartconfig.sweet.SuccessTickView;
 import com.raspi.easyfarming.R;
 import com.raspi.easyfarming.utils.okhttp.okHttpClientModel;
@@ -375,6 +382,7 @@ public class VideoActivity extends AppCompatActivity {
         getCurPlay().onVideoResume();
         super.onResume();
         isPause = false;
+        initNetBoardcastReceiver();
     }
 
     @Override
@@ -459,4 +467,33 @@ public class VideoActivity extends AppCompatActivity {
             return false;
         }
     });
+
+    /**
+     * 初始化网络广播
+     */
+    private void initNetBoardcastReceiver() {
+        ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        // 请注意这里会有一个版本适配bug，所以请在这里添加非空判断
+        if (connectivityManager != null) {
+            connectivityManager.requestNetwork(new NetworkRequest.Builder().build(), new ConnectivityManager.NetworkCallback() {
+                /**
+                 * 网络可用的回调
+                 */
+                @Override
+                public void onAvailable(Network network) {
+                    super.onAvailable(network);
+                    Log.e(TAG, "onAvailable");
+                }
+                /**
+                 * 网络丢失的回调
+                 */
+                @Override
+                public void onLost(Network network) {
+                    super.onLost(network);
+                    ToastUtils.showShort("无可用的网络，请连接网络");
+                }
+            });
+        }
+    }
+
 }

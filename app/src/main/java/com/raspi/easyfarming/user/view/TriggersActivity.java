@@ -1,8 +1,9 @@
 package com.raspi.easyfarming.user.view;
 
 import android.content.Context;
-import android.content.IntentFilter;
 import android.net.ConnectivityManager;
+import android.net.Network;
+import android.net.NetworkRequest;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -18,17 +19,14 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.Switch;
 import android.widget.Toast;
 
 import com.alibaba.fastjson.JSONArray;
+import com.blankj.utilcode.util.ToastUtils;
 import com.othershe.baseadapter.ViewHolder;
 import com.othershe.baseadapter.interfaces.OnItemChildClickListener;
-import com.othershe.baseadapter.interfaces.OnItemClickListener;
 import com.raspi.easyfarming.R;
 import com.raspi.easyfarming.user.adapter.TriggersAdapter;
-import com.raspi.easyfarming.utils.network.NetBroadcastReceiver;
 import com.raspi.easyfarming.utils.okhttp.okHttpClientModel;
 
 import java.util.ArrayList;
@@ -65,13 +63,6 @@ public class TriggersActivity extends AppCompatActivity {
 
     //Handler
     private Handler handler;
-
-    //广播
-    private NetBroadcastReceiver netBroadcastReceiver;
-
-    public TriggersActivity(){
-
-    }
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -210,12 +201,6 @@ public class TriggersActivity extends AppCompatActivity {
         initNetBoardcastReceiver();//初始化广播
     }
 
-    @Override
-    protected void onPause() {
-        super.onPause();
-        unregisterReceiver(netBroadcastReceiver);//退出时注销广播
-    }
-
 
 
     /************************** 初始化 **********************************/
@@ -340,23 +325,28 @@ public class TriggersActivity extends AppCompatActivity {
      * 初始化网络广播
      */
     private void initNetBoardcastReceiver() {
-        if (netBroadcastReceiver == null) {
-            netBroadcastReceiver = new NetBroadcastReceiver();
-            netBroadcastReceiver.setNetChangeListern(new NetBroadcastReceiver.NetChangeListener() {
+        ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        // 请注意这里会有一个版本适配bug，所以请在这里添加非空判断
+        if (connectivityManager != null) {
+            connectivityManager.requestNetwork(new NetworkRequest.Builder().build(), new ConnectivityManager.NetworkCallback() {
+                /**
+                 * 网络可用的回调
+                 */
                 @Override
-                public void onChangeListener(boolean status) {
-                    if (status) {
-                        /*startCompanyThread();*/
-                        getAllTriggerThread();
-                    } else {
-                        Toast.makeText(self, "无可用的网络，请连接网络", Toast.LENGTH_SHORT).show();
-                    }
+                public void onAvailable(Network network) {
+                    super.onAvailable(network);
+                    Log.e(TAG, "onAvailable");
+                }
+                /**
+                 * 网络丢失的回调
+                 */
+                @Override
+                public void onLost(Network network) {
+                    super.onLost(network);
+                    ToastUtils.showShort("无可用的网络，请连接网络");
                 }
             });
         }
-        IntentFilter filter = new IntentFilter();
-        filter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
-        registerReceiver(netBroadcastReceiver, filter);
     }
 
     /**

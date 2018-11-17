@@ -16,7 +16,7 @@
         android:layout_marginLeft="20dp"
         android:layout_marginRight="20dp"
         android:layout_marginTop="10dp"
-        android:hint="群组名称"
+        android:hint="@string/group_name_hint"
         />
 
     <EditText
@@ -29,5 +29,5 @@
         app:layout_constraintRight_toRightOf="@+id/dialog_addgroup_name"
         app:layout_constraintTop_toBottomOf="@+id/dialog_addgroup_name"
         android:layout_marginTop="10dp"
-        android:hint="备注信息" />
+        android:hint="@string/group_comment_hint" />
 </android.support.constraint.ConstraintLayout>

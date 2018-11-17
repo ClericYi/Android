@@ -1,7 +1,9 @@
 package com.raspi.easyfarming.user.view;
 
-import android.content.IntentFilter;
+import android.content.Context;
 import android.net.ConnectivityManager;
+import android.net.Network;
+import android.net.NetworkRequest;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -20,10 +22,10 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.alibaba.fastjson.JSONArray;
+import com.blankj.utilcode.util.ToastUtils;
 import com.othershe.baseadapter.interfaces.OnLoadMoreListener;
 import com.raspi.easyfarming.R;
 import com.raspi.easyfarming.user.adapter.LogsListAdapter;
-import com.raspi.easyfarming.utils.network.NetBroadcastReceiver;
 import com.raspi.easyfarming.utils.okhttp.okHttpClientModel;
 
 import java.util.ArrayList;
@@ -47,9 +49,6 @@ public class LogsActivity extends AppCompatActivity {
     private final int GETALLLOGS_ERROR = 3;
     private int PAGE = 0;
     private final int SIZE = 20;
-
-    //广播
-    private NetBroadcastReceiver netBroadcastReceiver;
 
     //控件
     @BindView(R.id.logs_rv)
@@ -250,36 +249,34 @@ public class LogsActivity extends AppCompatActivity {
         super.onResume();
         initNetBoardcastReceiver();//初始化广播
     }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        unregisterReceiver(netBroadcastReceiver);//退出时注销广播
-    }
-
     /**
      * 初始化网络广播
      */
     private void initNetBoardcastReceiver() {
-        if (netBroadcastReceiver == null) {
-            netBroadcastReceiver = new NetBroadcastReceiver();
-            netBroadcastReceiver.setNetChangeListern(new NetBroadcastReceiver.NetChangeListener() {
+        ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        // 请注意这里会有一个版本适配bug，所以请在这里添加非空判断
+        if (connectivityManager != null) {
+            connectivityManager.requestNetwork(new NetworkRequest.Builder().build(), new ConnectivityManager.NetworkCallback() {
+                /**
+                 * 网络可用的回调
+                 */
                 @Override
-                public void onChangeListener(boolean status) {
-                    if (status) {
-                        /*startCompanyThread();*/
-                        getAllLogThread();
-
-                    } else {
-                        Toast.makeText(self, "无可用的网络，请连接网络", Toast.LENGTH_SHORT).show();
-                    }
+                public void onAvailable(Network network) {
+                    super.onAvailable(network);
+                    Log.e(TAG, "onAvailable");
+                }
+                /**
+                 * 网络丢失的回调
+                 */
+                @Override
+                public void onLost(Network network) {
+                    super.onLost(network);
+                    ToastUtils.showShort("无可用的网络，请连接网络");
                 }
             });
         }
-        IntentFilter filter = new IntentFilter();
-        filter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
-        registerReceiver(netBroadcastReceiver, filter);
     }
+
 
     /**
      * Home键的事件监听

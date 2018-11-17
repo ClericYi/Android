@@ -1,9 +1,9 @@
 package com.raspi.easyfarming.login.view
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.content.Intent
-import android.content.IntentFilter
-import android.net.ConnectivityManager
+import android.net.*
 import android.os.Bundle
 import android.os.Handler
 import android.os.Message
@@ -15,15 +15,14 @@ import android.view.View
 import android.widget.Toast
 import com.alibaba.fastjson.JSON.parseObject
 import com.alibaba.fastjson.JSON.toJSONString
+import com.blankj.utilcode.util.ToastUtils
 import com.raspi.easyfarming.R
 import com.raspi.easyfarming.main.view.MainActivity
 import com.raspi.easyfarming.utils.MD5Utils
 import com.raspi.easyfarming.utils.SharePreferenceUtil
 import com.raspi.easyfarming.utils.okhttp.okHttpClientModel
-import com.raspi.easyfarming.utils.network.NetBroadcastReceiver
 import kotlinx.android.synthetic.main.activity_login.*
 import kotlinx.android.synthetic.main.activity_login.view.*
-import kotlinx.android.synthetic.main.sample_video_land.view.*
 import okhttp3.*
 import java.util.ArrayList
 import java.util.HashMap
@@ -37,9 +36,6 @@ class LoginActivity : AppCompatActivity() {
     private val LOGIN_SUCCESS = 1
     private val LOGIN_FAIL = 2
     private val LOGIN_ERROR = 3
-
-    //广播
-    private var netBroadcastReceiver:NetBroadcastReceiver?=null
 
     //sharePreference
     private var spUtil:SharePreferenceUtil?=null
@@ -183,12 +179,14 @@ class LoginActivity : AppCompatActivity() {
                 LOGIN_FAIL -> {
                     login_button.isEnabled = true
                     login_button.background = resources.getDrawable(R.drawable.ic_login_button,null)
+                    login_button.text = "登 录"
                     Log.e(TAG, "登陆失败，请检查您的账号和密码", null)
                     Toast.makeText(self, "登陆失败，请检查您的账号和密码", Toast.LENGTH_SHORT).show()
                 }
                 LOGIN_ERROR -> {
                     login_button.isEnabled = true
                     login_button.background = resources.getDrawable(R.drawable.ic_login_button,null)
+                    login_button.text = "登 录"
                     Log.e(TAG, "出现未知异常", null)
                     Toast.makeText(self, "出现未知异常", Toast.LENGTH_SHORT).show()
                 }
@@ -201,30 +199,28 @@ class LoginActivity : AppCompatActivity() {
      * 初始化网络广播
      */
     private fun initNetBoardcastReceiver() {
-        //Log.e(TAG, "广播监听中", null)
-        if (netBroadcastReceiver == null) {
-            netBroadcastReceiver = NetBroadcastReceiver()
-            netBroadcastReceiver?.setNetChangeListern(object : NetBroadcastReceiver.NetChangeListener {
-                override fun onChangeListener(status: Boolean) {
-                    if (status) {
-                        /*startCompanyThread();*/
-                    } else {
-                        Toast.makeText(self, "无可用的网络，请连接网络", Toast.LENGTH_SHORT).show()
-                    }
-                }
-            })
-        }
-        val filter = IntentFilter()
-        filter.addAction(ConnectivityManager.CONNECTIVITY_ACTION)
-        registerReceiver(netBroadcastReceiver, filter)
+        val connectivityManager = getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        // 请注意这里会有一个版本适配bug，所以请在这里添加非空判断
+        connectivityManager?.requestNetwork(NetworkRequest.Builder().build(), object : ConnectivityManager.NetworkCallback() {
+            /**
+             * 网络可用的回调
+             */
+            override fun onAvailable(network: Network) {
+                super.onAvailable(network)
+                Log.e(TAG, "onAvailable")
+            }
+
+            /**
+             * 网络丢失的回调
+             */
+            override fun onLost(network: Network) {
+                super.onLost(network)
+                ToastUtils.showShort("无可用的网络，请连接网络")
+            }
+        })
     }
 
     /***********************    生命周期中的操作    ****************************/
-
-    override fun onPause() {
-        super.onPause()
-        unregisterReceiver(netBroadcastReceiver)
-    }
 
     override fun onResume() {
         super.onResume()

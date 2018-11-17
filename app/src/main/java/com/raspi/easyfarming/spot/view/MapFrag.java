@@ -68,6 +68,7 @@ public class MapFrag extends Fragment {
         if(flag == 0){
             initEach(savedInstanceState);
         }
+        //特殊初始化
         return view;
     }
 

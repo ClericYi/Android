@@ -26,23 +26,18 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.alibaba.fastjson.JSONArray;
-import com.amap.api.location.AMapLocation;
-import com.amap.api.location.AMapLocationClient;
-import com.amap.api.location.AMapLocationClientOption;
-import com.amap.api.location.AMapLocationListener;
 import com.blankj.utilcode.util.ToastUtils;
 import com.othershe.baseadapter.ViewHolder;
 import com.othershe.baseadapter.interfaces.OnItemChildClickListener;
 import com.othershe.baseadapter.interfaces.OnItemClickListener;
 import com.raspi.easyfarming.R;
 import com.raspi.easyfarming.device.adapter.ListAdapter;
+import com.raspi.easyfarming.utils.gps.Location;
 import com.raspi.easyfarming.utils.okhttp.okHttpClientModel;
 
 import org.angmarch.views.NiceSpinner;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -55,7 +50,7 @@ import static com.alibaba.fastjson.JSON.parseObject;
 import static com.alibaba.fastjson.JSON.toJSONString;
 
 
-public class DeviceFrag extends Fragment implements AMapLocationListener {
+public class DeviceFrag extends Fragment {
 
     //常量
     private final String TAG = "DeviceFrag";
@@ -98,8 +93,7 @@ public class DeviceFrag extends Fragment implements AMapLocationListener {
     private List<String> groupName;
     private List<String> groupNum;
     private boolean isShow = false;
-    private String longitude="0";
-    private String latitude="0";
+
 
 
     //适配器
@@ -116,14 +110,14 @@ public class DeviceFrag extends Fragment implements AMapLocationListener {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        if(view == null) {
+        if (view == null) {
             view = inflater.from(getContext()).inflate(R.layout.frag_device_list, null);
         }
         ViewGroup parent = (ViewGroup) view.getParent();
         if (parent != null) {
             parent.removeView(view);
         }
-        if(flag == 0){
+        if (flag == 0) {
             initEach();//初始化所有
         }
         return view;
@@ -132,8 +126,7 @@ public class DeviceFrag extends Fragment implements AMapLocationListener {
     /**
      * 初始化所有
      */
-    private void initEach(){
-        initGPS();
+    private void initEach() {
         initView(view);//初始化控件
         initList();//初始化列表
         initHandler();//初始化Handler
@@ -147,20 +140,20 @@ public class DeviceFrag extends Fragment implements AMapLocationListener {
     /**
      * 获取所有设备线程
      */
-    public void getAllDevicesThread(){
+    public void getAllDevicesThread() {
         PAGE = 0;
         new Thread(new Runnable() {
             @Override
             public void run() {
                 try {
                     Request request = null;
-                    if(groupSpinner.getSelectedIndex()==0) {
+                    if (groupSpinner.getSelectedIndex() == 0) {
                         request = new Request.Builder()
                                 .url(getContext().getResources().getString(R.string.URL_Device_GetAllDevices) + PAGE + "/" + SIZE)
                                 .build();
-                    }else{
-                        request= new Request.Builder()
-                                .url(getContext().getResources().getString(R.string.URL_Device_getAllDevicesByGroup)+groupNum.get(groupSpinner.getSelectedIndex())+"/" + PAGE + "/" + SIZE)
+                    } else {
+                        request = new Request.Builder()
+                                .url(getContext().getResources().getString(R.string.URL_Device_getAllDevicesByGroup) + groupNum.get(groupSpinner.getSelectedIndex()-1) + "/" + PAGE + "/" + SIZE)
                                 .build();
                     }
 
@@ -169,18 +162,18 @@ public class DeviceFrag extends Fragment implements AMapLocationListener {
                     String result = response.body().string();
                     Log.e(TAG, result, null);
                     String getResult = parseObject(parseObject(result).get("data").toString()).get("data").toString();
-                    if(getResult.equals("[]")){
+                    if (getResult.equals("[]")) {
                         devices.clear();
                         handler.sendEmptyMessage(GETALLDEVICE_FAIL);
                         return;
-                    }else {
+                    } else {
                         devices.clear();
                         List<Map> result_devices = JSONArray.parseArray(getResult, Map.class);
                         devices.addAll(result_devices);
                         handler.sendEmptyMessage(GETALLDEVICE_SUCCESS);
                     }
 
-                }catch (Exception e){
+                } catch (Exception e) {
                     e.printStackTrace();
                     handler.sendEmptyMessage(GETALLDEVICE_ERROR);
                 }
@@ -191,20 +184,19 @@ public class DeviceFrag extends Fragment implements AMapLocationListener {
     /**
      * 获取剩余未获取设备线程
      */
-    public void getRestDevicesThread(){
+    public void getRestDevicesThread() {
         new Thread(new Runnable() {
             @Override
             public void run() {
                 try {
-
                     Request request = null;
-                    if(groupSpinner.getSelectedIndex()==0) {
+                    if (groupSpinner.getSelectedIndex() == 0) {
                         request = new Request.Builder()
                                 .url(getContext().getResources().getString(R.string.URL_Device_GetAllDevices) + PAGE + "/" + SIZE)
                                 .build();
-                    }else{
-                        request= new Request.Builder()
-                                .url(getContext().getResources().getString(R.string.URL_Device_getAllDevicesByGroup)+groupNum.get(groupSpinner.getSelectedIndex())+"/" + PAGE + "/" + SIZE)
+                    } else {
+                        request = new Request.Builder()
+                                .url(getContext().getResources().getString(R.string.URL_Device_getAllDevicesByGroup) + groupNum.get(groupSpinner.getSelectedIndex() - 1) + "/" + PAGE + "/" + SIZE)
                                 .build();
                     }
 
@@ -214,16 +206,16 @@ public class DeviceFrag extends Fragment implements AMapLocationListener {
                     Log.e(TAG, result, null);
                     String getResult = parseObject(parseObject(result).get("data").toString()).get("data").toString();
 
-                    if(getResult.equals("[]")){
+                    if (getResult.equals("[]")) {
                         handler.sendEmptyMessage(GETALLDEVICE_FAIL);
                         return;
-                    }else {
+                    } else {
                         List<Map> result_devices = JSONArray.parseArray(getResult, Map.class);
                         devices.addAll(result_devices);
                         handler.sendEmptyMessage(GETALLDEVICE_SUCCESS);
                     }
 
-                }catch (Exception e){
+                } catch (Exception e) {
                     e.printStackTrace();
                     handler.sendEmptyMessage(GETALLDEVICE_ERROR);
                 }
@@ -234,7 +226,7 @@ public class DeviceFrag extends Fragment implements AMapLocationListener {
     /**
      * 获得所有分组线程
      */
-    public void getAllGroupThread(){
+    public void getAllGroupThread() {
         groupName = new ArrayList<String>();
         groupNum = new ArrayList<String>();
         new Thread(new Runnable() {
@@ -253,10 +245,10 @@ public class DeviceFrag extends Fragment implements AMapLocationListener {
                     Log.e(TAG, result, null);
                     List<String> result_Groups = JSONArray.parseArray(parseObject(result).get("data").toString(), String.class);
 
-                    if(result_Groups.size()<1){
+                    if (result_Groups.size() < 1) {
                         handler.sendEmptyMessage(GETALLGROUP_FAIL);
                         return;
-                    }else {
+                    } else {
                         for (int i = 0; i < result_Groups.size(); i++) {
                             groupName.add(parseObject(result_Groups.get(i)).get("name").toString());
                             groupNum.add(parseObject(result_Groups.get(i)).get("id").toString());
@@ -264,7 +256,7 @@ public class DeviceFrag extends Fragment implements AMapLocationListener {
                         handler.sendEmptyMessage(GETALLGROUP_SUCCESS);
                     }
 
-                }catch (Exception e){
+                } catch (Exception e) {
                     e.printStackTrace();
                     handler.sendEmptyMessage(GETALLGROUP_ERROR);
                 }
@@ -276,7 +268,7 @@ public class DeviceFrag extends Fragment implements AMapLocationListener {
     /**
      * 添加分组
      */
-    private void addGroupThread(final String name, final String comment){
+    private void addGroupThread(final String name, final String comment) {
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -287,7 +279,7 @@ public class DeviceFrag extends Fragment implements AMapLocationListener {
                     map.put("groupName", name);
                     map.put("comment", comment);
 
-                    Log.e(TAG, toJSONString(map),null);
+                    Log.e(TAG, toJSONString(map), null);
 
                     RequestBody body = RequestBody.create(JSON, toJSONString(map));
 
@@ -301,14 +293,14 @@ public class DeviceFrag extends Fragment implements AMapLocationListener {
 
                     String getResult = parseObject(result).get("state").toString();
 
-                    if(!getResult.equals("1")){
+                    if (!getResult.equals("1")) {
                         handler.sendEmptyMessage(ADDGROUP_FAIL);
                         return;
-                    }else {
+                    } else {
                         Log.e(TAG, result, null);
                         handler.sendEmptyMessage(ADDGROUP_SUCCESS);
                     }
-                }catch (Exception e) {
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
@@ -317,6 +309,7 @@ public class DeviceFrag extends Fragment implements AMapLocationListener {
 
     /**
      * 添加设备
+     *
      * @param name
      * @param comment
      * @param groupId
@@ -324,16 +317,16 @@ public class DeviceFrag extends Fragment implements AMapLocationListener {
      * @param type
      * @param locationText
      */
-    private void createDeviceThread(final String name, final String comment, final String groupId, final String local, final String type, final String locationText){
+    private void createDeviceThread(final String name, final String comment, final String groupId, final String local, final String type, final String locationText) {
         new Thread(new Runnable() {
             @Override
             public void run() {
                 try {
-                    if(name.equals("")||comment.equals("")||local.equals("")||type.equals("")||groupId.equals("")){
+                    if (name.equals("") || comment.equals("") || local.equals("") || type.equals("") || groupId.equals("")) {
                         handler.sendEmptyMessage(ADDDEVICE_FAIL);
                         return;
                     }
-                    if(longitude.equals("0")||latitude.equals("0")){
+                    if (Location.INSTANCE.getLatitude().equals("0") || Location.INSTANCE.getLongitude().equals("0")) {
                         handler.sendEmptyMessage(GETLOCAL_FAIL);
                         return;
                     }
@@ -344,10 +337,10 @@ public class DeviceFrag extends Fragment implements AMapLocationListener {
                     map.put("deviceType", type);
                     map.put("groupId", groupId);
                     map.put("locationDescribe", local);
-                    map.put("latitude", latitude);
-                    map.put("longitude", longitude);
+                    map.put("latitude", Location.INSTANCE.getLatitude());
+                    map.put("longitude", Location.INSTANCE.getLongitude());
 
-                    Log.e(TAG, toJSONString(map),null);
+                    Log.e(TAG, toJSONString(map), null);
 
                     RequestBody body = RequestBody.create(JSON, toJSONString(map));
 
@@ -362,14 +355,14 @@ public class DeviceFrag extends Fragment implements AMapLocationListener {
 
                     String getResult = parseObject(result).get("state").toString();
 
-                    if(!getResult.equals("1")){
+                    if (!getResult.equals("1")) {
                         handler.sendEmptyMessage(ADDDEVICE_FAIL);
                         return;
-                    }else {
+                    } else {
                         Log.e(TAG, result, null);
                         handler.sendEmptyMessage(ADDDEVICE_SUCCESS);
                     }
-                }catch (Exception e) {
+                } catch (Exception e) {
                     e.printStackTrace();
                     handler.sendEmptyMessage(ADDDEVICE_ERROR);
                 }
@@ -380,7 +373,7 @@ public class DeviceFrag extends Fragment implements AMapLocationListener {
     /**
      * 删除设备线程
      */
-    public void deleteDeviceThread(final List<String> deviceid){
+    public void deleteDeviceThread(final List<String> deviceid) {
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -399,13 +392,13 @@ public class DeviceFrag extends Fragment implements AMapLocationListener {
                         Log.e(TAG, result, null);
                         String getResult = parseObject(result).get("state").toString();
 
-                        if(!getResult.equals("1")){
+                        if (!getResult.equals("1")) {
                             handler.sendEmptyMessage(DELETEDEVICE_FAIL);
                             return;
                         }
                     }
                     handler.sendEmptyMessage(DELETEDEVICE_SUCCESS);
-                } catch(Exception e){
+                } catch (Exception e) {
                     e.printStackTrace();
                     handler.sendEmptyMessage(DELETEDEVICE_ERROR);
                 }
@@ -418,7 +411,7 @@ public class DeviceFrag extends Fragment implements AMapLocationListener {
     /**
      * 发送指令
      */
-    public void sendCmdToThread(final String data, final String deviceId){
+    public void sendCmdToThread(final String data, final String deviceId) {
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -443,12 +436,12 @@ public class DeviceFrag extends Fragment implements AMapLocationListener {
                     Log.e(TAG, result, null);
                     String getResult = parseObject(result).get("state").toString();
 
-                    if(!getResult.equals("1")){
+                    if (!getResult.equals("1")) {
                         handler.sendEmptyMessage(SENDCMD_FAIL);
                         return;
                     }
                     handler.sendEmptyMessage(SENDCMD_SUCCESS);
-                } catch(Exception e){
+                } catch (Exception e) {
                     e.printStackTrace();
                     handler.sendEmptyMessage(SENDCMD_ERROR);
                 }
@@ -477,9 +470,9 @@ public class DeviceFrag extends Fragment implements AMapLocationListener {
             @Override
             public void onClick(View view) {
                 isShow = !isShow;
-                device_delete.setVisibility(isShow?View.VISIBLE:View.GONE);
-                device_edit.setText(isShow?"取消":"编辑");
-                device_add.setVisibility(isShow?View.GONE:View.VISIBLE);
+                device_delete.setVisibility(isShow ? View.VISIBLE : View.GONE);
+                device_edit.setText(isShow ? "取消" : "编辑");
+                device_add.setVisibility(isShow ? View.GONE : View.VISIBLE);
                 listAdapter.changCheckShow(isShow);
             }
         });
@@ -489,7 +482,7 @@ public class DeviceFrag extends Fragment implements AMapLocationListener {
             @Override
             public void onClick(View view) {
                 List<String> list = listAdapter.getCheckedId();
-                if(list == null || list.size() == 0)
+                if (list == null || list.size() == 0)
                     return;
                 deleteDeviceThread(list);
             }
@@ -534,9 +527,10 @@ public class DeviceFrag extends Fragment implements AMapLocationListener {
 
     /**
      * 初始化Spinner
+     *
      * @param spinner
      */
-    public void initDialogSpinner(NiceSpinner spinner){
+    public void initDialogSpinner(NiceSpinner spinner) {
         groupAdapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_item, groupName);
         groupAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner.setAdapter(groupAdapter);
@@ -569,17 +563,16 @@ public class DeviceFrag extends Fragment implements AMapLocationListener {
             }
 
 
-
         });
     }
 
     /**
      * 初始化Spinner
      */
-    private void initGroup(){
+    private void initGroup() {
         groups = new ArrayList<>();
         groups.add("所有设备");
-        if(groupName.size()>0) {
+        if (groupName.size() > 0) {
             groups.addAll(groupName);
         }
         groups.add("添加分组");
@@ -590,7 +583,7 @@ public class DeviceFrag extends Fragment implements AMapLocationListener {
         groupSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-                if(i < groups.size()-1){
+                if (i < groups.size() - 1) {
                     getAllDevicesThread();
                 } else {
                     LayoutInflater inflater = getActivity().getLayoutInflater();
@@ -620,7 +613,6 @@ public class DeviceFrag extends Fragment implements AMapLocationListener {
     }
 
 
-
     /**
      * 初始化RecycleView
      */
@@ -639,11 +631,11 @@ public class DeviceFrag extends Fragment implements AMapLocationListener {
         listAdapter.setOnItemClickListener(new OnItemClickListener<Map>() {
             @Override
             public void onItemClick(ViewHolder viewHolder, Map map, int i) {
-                if(isShow){
-                    ((CheckBox)viewHolder.getView(R.id.item_device_rb)).setChecked(!((CheckBox)viewHolder.getView(R.id.item_device_rb)).isChecked());
+                if (isShow) {
+                    ((CheckBox) viewHolder.getView(R.id.item_device_rb)).setChecked(!((CheckBox) viewHolder.getView(R.id.item_device_rb)).isChecked());
                     listAdapter.getCheckedId().add(map.get("id").toString());
-                    Log.e("listAdapter", ""+listAdapter.getCheckedId().size(), null);
-                }else{
+                    Log.e("listAdapter", "" + listAdapter.getCheckedId().size(), null);
+                } else {
                     Intent intent = new Intent(getContext(), DetailCenterAcitity.class);
                     intent.putExtra("id", map.get("id").toString());
                     intent.putExtra("name", map.get("name").toString());
@@ -655,7 +647,7 @@ public class DeviceFrag extends Fragment implements AMapLocationListener {
         listAdapter.setOnItemChildClickListener(R.id.item_device_send, new OnItemChildClickListener<Map>() {
             @Override
             public void onItemChildClick(ViewHolder viewHolder, Map map, int i) {
-                sendCmdToThread(((TextView)viewHolder.getView(R.id.item_device_ctrl)).getText().toString(),map.get("id").toString());
+                sendCmdToThread(((TextView) viewHolder.getView(R.id.item_device_ctrl)).getText().toString(), map.get("id").toString());
             }
         });
 
@@ -671,14 +663,15 @@ public class DeviceFrag extends Fragment implements AMapLocationListener {
 
     /**
      * 初始化控件
+     *
      * @param view
      */
     private void initView(View view) {
-        groupSpinner =  view.findViewById(R.id.frag_deivce_spinner);
-        device_rv =  view.findViewById(R.id.frag_deivce_rv);
-        device_edit =  view.findViewById(R.id.frag_device_edit);
-        device_add =  view.findViewById(R.id.frag_device_add);
-        device_delete =  view.findViewById(R.id.frag_device_delete);
+        groupSpinner = view.findViewById(R.id.frag_deivce_spinner);
+        device_rv = view.findViewById(R.id.frag_deivce_rv);
+        device_edit = view.findViewById(R.id.frag_device_edit);
+        device_add = view.findViewById(R.id.frag_device_add);
+        device_delete = view.findViewById(R.id.frag_device_delete);
     }
 
     /**
@@ -688,9 +681,9 @@ public class DeviceFrag extends Fragment implements AMapLocationListener {
         handler = new Handler(new Handler.Callback() {
             @Override
             public boolean handleMessage(Message message) {
-                switch (message.what){
+                switch (message.what) {
                     case GETALLDEVICE_SUCCESS:
-                        if(devices.size()%SIZE!=0){
+                        if (devices.size() % SIZE != 0) {
                             listAdapter.loadEnd();
                         }
                         PAGE++;
@@ -698,7 +691,7 @@ public class DeviceFrag extends Fragment implements AMapLocationListener {
                         Log.e(TAG, "获取所有设备成功", null);
                         break;
                     case GETALLDEVICE_FAIL:
-                        if(devices.size()<1) {
+                        if (devices.size() < 1) {
                             listAdapter.removeEmptyView();
                             final View reloadLayout = LayoutInflater.from(getContext()).inflate(R.layout.load_reload, (ViewGroup) device_rv.getParent(), false);
                             reloadLayout.setOnClickListener(new View.OnClickListener() {
@@ -709,7 +702,7 @@ public class DeviceFrag extends Fragment implements AMapLocationListener {
                             });
                             listAdapter.setReloadView(reloadLayout);
                             Toast.makeText(getContext(), "该群组没有设备了,点击按钮重试", Toast.LENGTH_SHORT).show();
-                        }else{
+                        } else {
                             listAdapter.loadEnd();
                         }
                         break;
@@ -791,58 +784,5 @@ public class DeviceFrag extends Fragment implements AMapLocationListener {
     }
 
 
-
-    /************************************ 定位******************************************/
-    /**
-     *   实现GPS的方法
-     */
-    public void initGPS() {
-        //AmapGPS
-        AMapLocationClient mlocationClient;
-        AMapLocationClientOption mLocationOption = null;
-        Log.e(TAG, "GPS", null);
-        mlocationClient = new AMapLocationClient(getContext());
-        //初始化定位参数
-        mLocationOption = new AMapLocationClientOption();
-        //设置定位监听
-        mlocationClient.setLocationListener(this);
-        //设置定位模式为高精度模式，Battery_Saving为低功耗模式，Device_Sensors是仅设备模式
-        mLocationOption.setLocationMode(AMapLocationClientOption.AMapLocationMode.Hight_Accuracy);
-        //设置定位间隔,单位毫秒,默认为2000ms
-        mLocationOption.setInterval(10000);
-        //设置定位参数
-        mlocationClient.setLocationOption(mLocationOption);
-        // 此方法为每隔固定时间会发起一次定位请求，为了减少电量消耗或网络流量消耗，
-        // 注意设置合适的定位时间的间隔（最小间隔支持为1000ms），并且在合适时间调用stopLocation()方法来取消定位请求
-        // 在定位结束后，在合适的生命周期调用onDestroy()方法
-        // 在单次定位情况下，定位无论成功与否，都无需调用stopLocation()方法移除请求，定位sdk内部会移除
-        //启动定位
-        mlocationClient.startLocation();
-    }
-
-    /**
-     * 定位监听事件
-     * @param aMapLocation
-     */
-    @Override
-    public void onLocationChanged(AMapLocation aMapLocation) {
-        if (aMapLocation != null) {
-            if (aMapLocation.getErrorCode() == 0) {
-                //定位成功回调信息，设置相关消息
-                aMapLocation.getLocationType();//获取当前定位结果来源，如网络定位结果，详见定位类型表
-                latitude = String.format("%.2f",aMapLocation.getLatitude());//获取纬度
-                longitude =  String.format("%.2f",aMapLocation.getLongitude());//获取经度
-                aMapLocation.getAccuracy();//获取精度信息
-                SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-                Date date = new Date(aMapLocation.getTime());
-                df.format(date);//定位时间
-            } else {
-                //显示错误信息ErrCode是错误码，errInfo是错误信息，详见错误码表。
-                Log.e("AmapError","location Error, ErrCode:"
-                        + aMapLocation.getErrorCode() + ", errInfo:"
-                        + aMapLocation.getErrorInfo());
-            }
-        }
-    }
 
 }

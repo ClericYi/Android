@@ -14,7 +14,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
         android:typeface="serif"
-        android:textSize="10sp"
+        android:textSize="12sp"
         android:layout_marginTop="10dp"/>
 
     <ImageView
