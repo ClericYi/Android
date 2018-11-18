@@ -26,8 +26,14 @@ import kotlinx.android.synthetic.main.activity_login.view.*
 import okhttp3.*
 import java.util.ArrayList
 import java.util.HashMap
+import com.jia.jsfingerlib.JsFingerUtils
 
-class LoginActivity : AppCompatActivity() {
+class LoginActivity : AppCompatActivity(), FingerDialog.FingerInputListener {
+
+    override fun onCompleteFingerInput() {
+            initSharePreference()
+    }
+
 
     //常量
     private val TAG = "LoginActivity"
@@ -49,9 +55,19 @@ class LoginActivity : AppCompatActivity() {
         setContentView(R.layout.activity_login)
         initView()//对控件的样式等操作
         initClick()//初始化点击事件
-        initSharePreference()//初始化信息
+        initFinger()//初始化指纹识别
     }
 
+    /**
+     * 初始化指纹识别
+     */
+    private fun initFinger() {
+        val jsFingerUtils = JsFingerUtils(baseContext)
+        if (jsFingerUtils.checkSDKVersion()) {
+            val fingerDialog = FingerDialog();
+            fingerDialog.show(supportFragmentManager, "FingerDialog")
+        }
+    }
 
 
     /*************************              线程         ************************************/
@@ -123,6 +139,7 @@ class LoginActivity : AppCompatActivity() {
             login_remember.isChecked = true
             login_username.text = Editable.Factory.getInstance().newEditable(spUtil?.getString("username"))
             login_password.text = Editable.Factory.getInstance().newEditable(spUtil?.getString("password"))
+            startLoginThread()
         }
     }
 
@@ -148,7 +165,6 @@ class LoginActivity : AppCompatActivity() {
      */
     private fun initView() {
         supportActionBar?.hide()
-
     }
 
     /**
@@ -227,7 +243,7 @@ class LoginActivity : AppCompatActivity() {
         initNetBoardcastReceiver()
     }
 
-    /*********************** 物理键重写  */
+    /*********************** 物理键重写  ***************************************/
     override fun onKeyDown(keyCode: Int, event: KeyEvent): Boolean {
         if (keyCode == KeyEvent.KEYCODE_BACK) {
             moveTaskToBack(true)
@@ -235,4 +251,6 @@ class LoginActivity : AppCompatActivity() {
         }
         return super.onKeyDown(keyCode, event)
     }
+
+
 }

@@ -123,4 +123,8 @@
     <!-- dialog -->
     <string name="group_name_hint">群组名称</string>
     <string name="group_comment_hint">备注信息</string>
+    <string name="finger_quit">取消</string>
+    <string name="finger_false">指纹错误，请再次重新尝试</string>
+    <string name="finger_true">指纹正确，登录中</string>
+    <string name="finger_text">请输入你的指纹</string>
 </resources>

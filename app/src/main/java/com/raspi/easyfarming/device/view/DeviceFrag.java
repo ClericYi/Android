@@ -683,6 +683,7 @@ public class DeviceFrag extends Fragment {
             public boolean handleMessage(Message message) {
                 switch (message.what) {
                     case GETALLDEVICE_SUCCESS:
+                        listAdapter.removeEmptyView();
                         if (devices.size() % SIZE != 0) {
                             listAdapter.loadEnd();
                         }

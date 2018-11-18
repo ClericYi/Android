@@ -17,6 +17,9 @@
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
 
+    <!-- 指纹识别 -->
+    <uses-permission android:name="android.permission.USE_FINGERPRINT"/>
+
 
     <application
         android:name=".utils.base.MyApplication"

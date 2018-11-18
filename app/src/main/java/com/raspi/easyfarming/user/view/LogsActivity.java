@@ -155,6 +155,13 @@ public class LogsActivity extends AppCompatActivity {
     /****************************  初始化  **************************************/
 
     /**
+     * 初始化线程
+     */
+    private void initThread(){
+        getAllLogThread();
+    }
+
+    /**
      * 初始化handler
      */
     private void initHandler() {
@@ -163,6 +170,7 @@ public class LogsActivity extends AppCompatActivity {
             public boolean handleMessage(Message msg) {
                 switch (msg.what) {
                     case GETALLLOGS_SUCCESS:
+                        logsListAdapter.removeEmptyView();
                         if(getSize < SIZE){
                             logsListAdapter.loadEnd();
                         }
@@ -170,8 +178,18 @@ public class LogsActivity extends AppCompatActivity {
                         logsListAdapter.notifyDataSetChanged();
                         break;
                     case GETALLLOGS_FAIL:
+                        logsListAdapter.removeEmptyView();
                         break;
                     case GETALLLOGS_ERROR:
+                        logsListAdapter.removeEmptyView();
+                        final View reloadLayout = LayoutInflater.from(getBaseContext()).inflate(R.layout.load_reload, (ViewGroup) recyclerView.getParent(), false);
+                        reloadLayout.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                getAllLogThread();
+                            }
+                        });
+                        logsListAdapter.setReloadView(reloadLayout);
                         break;
                 }
                 return false;
@@ -263,6 +281,7 @@ public class LogsActivity extends AppCompatActivity {
                 @Override
                 public void onAvailable(Network network) {
                     super.onAvailable(network);
+                    initThread();//初始化线程
                     Log.e(TAG, "onAvailable");
                 }
                 /**

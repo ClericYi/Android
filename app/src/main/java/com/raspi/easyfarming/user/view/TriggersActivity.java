@@ -192,6 +192,8 @@ public class TriggersActivity extends AppCompatActivity {
 
 
     /************************* 生命周期 ***********************************/
+
+
     /**
      * 生命周期中的初始化过程
      */
@@ -204,6 +206,13 @@ public class TriggersActivity extends AppCompatActivity {
 
 
     /************************** 初始化 **********************************/
+    /**
+     * 初始化线程
+     */
+    private void initThread(){
+        getAllTriggerThread();
+    }
+
     /**
      * 为RcycleView增加下拉加载
      */
@@ -260,12 +269,12 @@ public class TriggersActivity extends AppCompatActivity {
                         }
                         break;
                     case GETALLTRIGGERS_SUCCESS:
+                        triggersAdapter.removeEmptyView();
                         if(triggers.size()%Size!=0){
                             triggersAdapter.loadEnd();
                         }
                         Page++;
                         triggersAdapter.notifyDataSetChanged();
-                        Toast.makeText(self, "触发器获取成功", Toast.LENGTH_SHORT).show();
                         break;
                     case CHANGESTATE_ERROR:
                         Log.e(TAG, "CHANGESTATE_ERROR", null);
@@ -335,6 +344,7 @@ public class TriggersActivity extends AppCompatActivity {
                 @Override
                 public void onAvailable(Network network) {
                     super.onAvailable(network);
+                    initThread();
                     Log.e(TAG, "onAvailable");
                 }
                 /**
