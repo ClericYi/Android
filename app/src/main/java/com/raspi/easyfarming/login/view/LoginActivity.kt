@@ -11,6 +11,7 @@ import android.support.v7.app.AppCompatActivity
 import android.text.Editable
 import android.util.Log
 import android.view.KeyEvent
+import android.view.View
 import android.widget.Toast
 import com.alibaba.fastjson.JSON.parseObject
 import com.alibaba.fastjson.JSON.toJSONString
@@ -30,7 +31,7 @@ import com.jia.jsfingerlib.JsFingerUtils
 class LoginActivity : AppCompatActivity(), FingerDialog.FingerInputListener {
 
     override fun onCompleteFingerInput() {
-            fingerLoginThread()
+            initSharePreference()
     }
 
 
@@ -54,10 +55,19 @@ class LoginActivity : AppCompatActivity(), FingerDialog.FingerInputListener {
         setContentView(R.layout.activity_login)
         initView()//对控件的样式等操作
         initClick()//初始化点击事件
-        initSharePreference()
+        initFinger()//初始化指纹识别
     }
 
-
+    /**
+     * 初始化指纹识别
+     */
+    private fun initFinger() {
+        val jsFingerUtils = JsFingerUtils(baseContext)
+        if (jsFingerUtils.checkSDKVersion()) {
+            val fingerDialog = FingerDialog();
+            fingerDialog.show(supportFragmentManager, "FingerDialog")
+        }
+    }
 
 
     /*************************              线程         ************************************/
@@ -84,68 +94,15 @@ class LoginActivity : AppCompatActivity(), FingerDialog.FingerInputListener {
                         })
                         .build()
                 //开始数据传输
-                val map = HashMap<String, String>()
+                var map = HashMap<String, String>()
                 map.put("loginParam", login_username.login_username.text.toString())
                 map.put("password", MD5Utils.stringToMD5(login_password.login_password.text.toString()))
                 val body = RequestBody.create(JSON, toJSONString(map))
 
-                val requestBody = Request.Builder()
+                var requestBody = Request.Builder()
                         .url(resources.getString(R.string.URL_Login))
                         .post(body)
-                        .build()
-                //接受回传消息
-                val response = okHttpClientModel.mOkHttpClient?.newCall(requestBody)?.execute()
-                val result = response?.body()?.string()
-                Log.e(TAG, result, null)
-
-                val loginResult = parseObject(result).get("state").toString()
-
-
-                if (loginResult.equals("1")){
-                    val data =  parseObject(parseObject(result).get("data").toString())
-                    email = data.get("email").toString()
-                    phone = data.get("phone").toString()
-                    handler.sendEmptyMessage(LOGIN_SUCCESS)
-                }else{
-                    handler.sendEmptyMessage(LOGIN_FAIL)
-                }
-            }catch (e:Exception){
-                handler.sendEmptyMessage(LOGIN_ERROR)
-            }
-        }
-    }).start()
-
-    /**
-     * 实现指纹登陆线程
-     */
-    private fun fingerLoginThread() = Thread(Runnable {
-        kotlin.run {
-            try {
-//                Log.e("LoginThread", "进入LoginThread",null)
-                //用于实现Cookie的保存
-                okHttpClientModel.mOkHttpClient = OkHttpClient.Builder()
-                        .cookieJar(object:CookieJar{
-                            val cookieStore = HashMap<String, List<Cookie>>()
-
-                            override fun saveFromResponse(url: HttpUrl, cookies: List<Cookie>) {
-                                cookieStore[url.host()] = cookies
-                            }
-
-                            override fun loadForRequest(url: HttpUrl): List<Cookie> {
-                                return cookieStore[url.host()]?: ArrayList()
-                            }
-                        })
-                        .build()
-                //开始数据传输
-                val map = HashMap<String, String>()
-                map.put("loginParam", spUtil?.getString("username").toString())
-                map.put("password", MD5Utils.stringToMD5(spUtil?.getString("password")))
-                val body = RequestBody.create(JSON, toJSONString(map))
-
-                val requestBody = Request.Builder()
-                        .url(resources.getString(R.string.URL_Login))
-                        .post(body)
-                        .build()
+                        .build();
                 //接受回传消息
                 val response = okHttpClientModel.mOkHttpClient?.newCall(requestBody)?.execute()
                 val result = response?.body()?.string()
@@ -173,17 +130,6 @@ class LoginActivity : AppCompatActivity(), FingerDialog.FingerInputListener {
     /*************************              初始化         ************************************/
 
     /**
-     * 初始化指纹识别
-     */
-    private fun initFinger() {
-        val jsFingerUtils = JsFingerUtils(baseContext)
-        if (jsFingerUtils.checkSDKVersion()) {
-            val fingerDialog = FingerDialog()
-            fingerDialog.show(supportFragmentManager, "FingerDialog")
-        }
-    }
-
-    /**
      * 初始化信息
      */
     private fun initSharePreference() {
@@ -192,9 +138,8 @@ class LoginActivity : AppCompatActivity(), FingerDialog.FingerInputListener {
         if(isChecked) {
             login_remember.isChecked = true
             login_username.text = Editable.Factory.getInstance().newEditable(spUtil?.getString("username"))
-            initFinger()
-//            login_password.text = Editable.Factory.getInstance().newEditable(spUtil?.getString("password"))
-//            startLoginThread()
+            login_password.text = Editable.Factory.getInstance().newEditable(spUtil?.getString("password"))
+            startLoginThread()
         }
     }
 
@@ -202,7 +147,7 @@ class LoginActivity : AppCompatActivity(), FingerDialog.FingerInputListener {
      * 初始化点击事件
      */
     private fun initClick() {
-        login_button.setOnClickListener{
+        login_button.setOnClickListener(View.OnClickListener {
             if((login_username.text.toString().equals("")||login_password.text.toString().equals(""))
                 ||(login_username.text.toString().equals(null)||login_password.text.toString().equals(null)))
                 Toast.makeText(baseContext,"请输入账号或密码", Toast.LENGTH_SHORT).show()
@@ -212,7 +157,7 @@ class LoginActivity : AppCompatActivity(), FingerDialog.FingerInputListener {
                 login_button.text = "登录中"
                 startLoginThread()
             }
-        }
+        })
     }
 
     /**
@@ -232,9 +177,9 @@ class LoginActivity : AppCompatActivity(), FingerDialog.FingerInputListener {
             when(msg?.what){
                 LOGIN_SUCCESS -> {Log.e(TAG, "登陆成功", null)
                     if(login_remember.isChecked){
-                        val Username = SharePreferenceUtil.ContentValue("username", login_username.text.toString())
-                        val Password = SharePreferenceUtil.ContentValue("password", login_password.text.toString())
-                        val isCheck = SharePreferenceUtil.ContentValue("isChecked", login_remember.isChecked)
+                        var Username = SharePreferenceUtil.ContentValue("username", login_username.text.toString())
+                        var Password = SharePreferenceUtil.ContentValue("password", login_password.text.toString())
+                        var isCheck = SharePreferenceUtil.ContentValue("isChecked", login_remember.isChecked)
                         spUtil?.putValues(Username, Password, isCheck)
                     }else{
                         spUtil?.clear()
@@ -272,7 +217,7 @@ class LoginActivity : AppCompatActivity(), FingerDialog.FingerInputListener {
     private fun initNetBoardcastReceiver() {
         val connectivityManager = getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
         // 请注意这里会有一个版本适配bug，所以请在这里添加非空判断
-        connectivityManager.requestNetwork(NetworkRequest.Builder().build(), object : ConnectivityManager.NetworkCallback() {
+        connectivityManager?.requestNetwork(NetworkRequest.Builder().build(), object : ConnectivityManager.NetworkCallback() {
             /**
              * 网络可用的回调
              */

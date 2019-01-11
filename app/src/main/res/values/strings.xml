@@ -30,8 +30,8 @@
     <string name="login_next">登录</string>
     <string name="login_hint_username">请输入您的帐号</string>
     <string name="login_hint_password">请输入您的密码</string>
-    <string name="login_remeber">记住帐号</string>
-    <string name="login_finger">指纹登录</string>
+    <string name="login_remeber">记住密码</string>
+
     <!--device-->
     <string name="device_online">在线设备</string>
     <string name="device_outline">离线设备</string>
