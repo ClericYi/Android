@@ -8,12 +8,11 @@
         android:id="@+id/device_text"
         android:layout_width="match_parent"
         android:layout_height="50dp"
-        android:text="@string/title_device"
+        android:background="@color/bnv_color"
         android:gravity="center"
-        android:typeface="serif"
+        android:text="@string/title_device"
         android:textSize="26sp"
-        android:background="@color/online_true"
-        />
+        android:typeface="serif" />
 
     <android.support.v4.app.FragmentTabHost
         android:id="@+id/device_tabhost"

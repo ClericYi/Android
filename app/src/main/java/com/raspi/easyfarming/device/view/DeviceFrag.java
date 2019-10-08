@@ -658,7 +658,8 @@ public class DeviceFrag extends Fragment {
         device_rv.setLayoutManager(new LinearLayoutManager(getContext()));
         device_rv.setHasFixedSize(true);
         device_rv.setItemAnimator(new DefaultItemAnimator());
-        device_rv.addItemDecoration(new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL));
+        /*隐藏分割线*/
+        //device_rv.addItemDecoration(new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL));
     }
 
     /**

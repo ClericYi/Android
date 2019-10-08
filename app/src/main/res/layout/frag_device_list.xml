@@ -46,11 +46,9 @@
         android:id="@+id/frag_deivce_rv"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:background="@color/white"
-        app:layout_constraintTop_toBottomOf="@id/frag_deivce_spinner"
-        app:layout_constraintBottom_toTopOf="@id/frag_device_delete"
         android:layout_marginTop="5dp"
-        />
+        app:layout_constraintBottom_toTopOf="@id/frag_device_delete"
+        app:layout_constraintTop_toBottomOf="@id/frag_deivce_spinner" />
 
     <TextView
         android:id="@+id/frag_device_delete"

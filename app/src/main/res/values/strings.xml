@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">简农</string>
+    <string name="app_name">易农</string>
 
     <!-- URL -->
     <string name="URL_Login">http://39.108.153.134:80/api/userLogin</string>

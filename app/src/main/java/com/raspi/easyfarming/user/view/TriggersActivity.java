@@ -319,7 +319,7 @@ public class TriggersActivity extends AppCompatActivity {
         trigger_rv.setLayoutManager(new LinearLayoutManager(getBaseContext()));
         trigger_rv.setHasFixedSize(true);
         trigger_rv.setItemAnimator(new DefaultItemAnimator());
-        trigger_rv.addItemDecoration(new DividerItemDecoration(getBaseContext(), DividerItemDecoration.VERTICAL));
+        //trigger_rv.addItemDecoration(new DividerItemDecoration(getBaseContext(), DividerItemDecoration.VERTICAL));
     }
 
     /**

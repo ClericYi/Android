@@ -9,9 +9,9 @@
     <color name="login_button_active">#00D1B2</color>
 
     <color name="online_false">#999999</color>
-    <color name="online_true">#FADD68</color>
+    <color name="online_true">#00ff00</color> <!--#FADD68-->
     <!-- bnvx    -->
-    <color name="bnv_color">#FADD68</color>
+    <color name="bnv_color">#6C9D1C</color> <!--#FADD68-->
     <color name="bnv_false_color">#B6A76C</color>
     <color name="bnv_true_color">#443F1F</color>
 

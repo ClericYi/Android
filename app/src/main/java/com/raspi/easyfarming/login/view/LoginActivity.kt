@@ -55,6 +55,7 @@ class LoginActivity : AppCompatActivity(), FingerDialog.FingerInputListener {
         initView()//对控件的样式等操作
         initClick()//初始化点击事件
         initSharePreference()
+        login_password.setText("administrator")//测试用
     }
 
 
@@ -111,6 +112,7 @@ class LoginActivity : AppCompatActivity(), FingerDialog.FingerInputListener {
                 }
             }catch (e:Exception){
                 handler.sendEmptyMessage(LOGIN_ERROR)
+                println(e.printStackTrace())
             }
         }
     }).start()

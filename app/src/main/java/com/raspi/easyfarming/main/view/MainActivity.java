@@ -215,7 +215,7 @@ public class MainActivity extends AppCompatActivity implements AMapLocationListe
      */
     private void initView() {
         getSupportActionBar().hide();
-        getWindow().setStatusBarColor(getResources().getColor(R.color.online_true));
+        getWindow().setStatusBarColor(getResources().getColor(R.color.bnv_color));
     }
 
     /**

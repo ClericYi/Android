@@ -27,5 +27,10 @@
         <item name="colorAccent">@color/bnv_color</item>
     </style>
 
+    <style name="SwitchTheme" parent="Theme.AppCompat.Light">
+        <item name="colorControlActivated">@color/online_true</item>
+        <item name="colorSwitchThumbNormal">#ECECEC</item>
+        <item name="android:colorForeground">#BDBDBD</item>
+    </style>
 
 </resources>
